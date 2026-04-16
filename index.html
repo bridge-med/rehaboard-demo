@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RehaBoard - リハビリ運営ダッシュボード</title>
+  <style>
+    /* ============================================
+       RehaBoard MVP プロトタイプ
+       1ファイルで動く業務ダッシュボード
+       ============================================ */
+
+    /* --- リセット・基本設定 --- */
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    :root {
+      --sidebar-w: 220px;
+      --header-h: 56px;
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-dim: #64748b;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+      --orange: #ea580c;
+      --orange-bg: #fff7ed;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --radius: 8px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    /* --- 全体レイアウト --- */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* --- サイドバー --- */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-logo {
+      padding: 8px 20px 24px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .sidebar-logo span {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-dim);
+      display: block;
+      margin-top: 2px;
+    }
+    .sidebar-nav {
+      flex: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    /* --- メインエリア --- */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* --- ヘッダー --- */
+    .header {
+      height: var(--header-h);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .header-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* --- コンテンツ --- */
+    .content {
+      padding: 24px 28px;
+    }
+
+    /* --- 画面の表示切替 --- */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ============================================
+       共通コンポーネント
+       ============================================ */
+
+    /* --- KPIカード --- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    /* プログレスバー */
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+    .kpi-percent {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* --- テーブル --- */
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background: #f8fafc;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    th:hover {
+      background: #f1f5f9;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover td {
+      background: #fafbfc;
+    }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .font-bold { font-weight: 600; }
+
+    /* --- 状態バッジ --- */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-green { background: var(--green-bg); color: var(--green); }
+    .badge-orange { background: var(--orange-bg); color: var(--orange); }
+    .badge-red { background: var(--red-bg); color: var(--red); }
+
+    /* --- セクションタイトル --- */
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* --- カード --- */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* --- 期間切替 --- */
+    .period-toggle {
+      display: inline-flex;
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .period-btn {
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.15s;
+    }
+    .period-btn.active {
+      background: var(--white);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    /* ============================================
+       [A] ダッシュボード固有
+       ============================================ */
+    .chart-area {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    /* 簡易棒グラフ（CSS only） */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 140px;
+      padding-top: 10px;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar {
+      width: 100%;
+      max-width: 36px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.4s ease;
+      position: relative;
+      min-height: 2px;
+    }
+    .bar:hover {
+      opacity: 0.8;
+    }
+    .bar-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+    .bar-value {
+      font-size: 10px;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    /* 目標ライン */
+    .chart-container {
+      position: relative;
+    }
+    .target-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      border-top: 2px dashed #94a3b8;
+      z-index: 1;
+    }
+    .target-label {
+      position: absolute;
+      right: 0;
+      font-size: 10px;
+      color: #94a3b8;
+      transform: translateY(-14px);
+    }
+
+    /* ペース判定 */
+    .pace-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+    }
+    .pace-item {
+      font-size: 13px;
+    }
+    .pace-item strong {
+      font-weight: 600;
+    }
+    .pace-good { color: var(--green); }
+    .pace-warn { color: var(--orange); }
+
+    /* 前日ハイライト */
+    .highlight-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .highlight-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .highlight-line {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    /* ============================================
+       [C] 入力画面固有
+       ============================================ */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .form-label .required {
+      color: var(--red);
+      margin-left: 2px;
+    }
+    .form-input, .form-select, .form-textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+    .btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* 入力済みリスト */
+    .record-list {
+      margin-top: 24px;
+    }
+    .record-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 6px 0;
+    }
+    .status-done { color: var(--green); }
+    .status-missing { color: var(--orange); }
+
+    /* ============================================
+       [D] 朝礼サマリー固有
+       ============================================ */
+    .summary-output {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      font-size: 13.5px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .summary-section {
+      margin-bottom: 16px;
+    }
+    .summary-heading {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-toast {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      z-index: 100;
+      animation: fadeIn 0.2s;
+    }
+    .copy-toast.show { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- PT別ミニバー --- */
+    .mini-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mini-bar-bg {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 120px;
+    }
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* --- 行展開 --- */
+    .expand-row {
+      display: none;
+    }
+    .expand-row.open {
+      display: table-row;
+    }
+    .expand-cell {
+      padding: 12px 14px 16px;
+      background: #f8fafc;
+    }
+    .expand-daily {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .expand-day {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      text-align: center;
+      min-width: 70px;
+    }
+    .expand-day-date {
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .expand-day-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .clickable { cursor: pointer; }
+
+    /* --- 直近3日トレンド --- */
+    .trend-nums {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      font-family: monospace;
+      color: var(--text-dim);
+    }
+    .trend-arrow {
+      font-size: 13px;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+    .trend-up { color: var(--green); }
+    .trend-flat { color: var(--text-dim); }
+    .trend-down { color: var(--orange); }
+
+    /* --- 残りペースボックス --- */
+    .remaining-highlight {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ========================================
+         サイドバー（全画面共通のナビゲーション）
+         ======================================== -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        RehaBoard
+        <span>リハビリ運営ダッシュボード</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" onclick="navigateTo('dashboard')">
+          <span class="nav-icon">📊</span> ダッシュボード
+        </div>
+        <div class="nav-item" onclick="navigateTo('staff')">
+          <span class="nav-icon">👥</span> PT別実績
+        </div>
+        <div class="nav-item" onclick="navigateTo('input')">
+          <span class="nav-icon">📝</span> データ入力
+        </div>
+        <div class="nav-item" onclick="navigateTo('briefing')">
+          <span class="nav-icon">🎤</span> 朝礼サマリー
+        </div>
+      </nav>
+      <div style="padding: 16px 20px; font-size: 11px; color: var(--text-dim); border-top: 1px solid var(--border);">
+        MVP プロトタイプ v0.1<br>
+        サンプル整形外科クリニック
+      </div>
+    </aside>
+
+    <!-- ========================================
+         メインエリア
+         ======================================== -->
+    <main class="main">
+      <!-- ヘッダー -->
+      <header class="header">
+        <div class="header-title" id="header-title">ダッシュボード</div>
+        <div class="header-meta">2026年4月 ｜ 営業日 14/18日経過</div>
+      </header>
+
+      <div class="content">
+
+        <!-- ==========================================
+             [A] ダッシュボード
+             ========================================== -->
+        <div class="page active" id="page-dashboard">
+
+          <!-- 期間切替 -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div class="section-title">4月の進捗</div>
+            <div class="period-toggle">
+              <button class="period-btn active">日次</button>
+              <button class="period-btn">週次</button>
+              <button class="period-btn">月次</button>
+            </div>
+          </div>
+
+          <!-- KPIカード 5枚 -->
+          <div class="kpi-grid" id="kpi-cards">
+            <!-- JavaScriptで動的に生成 -->
+          </div>
+
+          <!-- 日別推移グラフ -->
+          <div class="chart-area">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <div style="font-size:13px; font-weight:600;">日別単位数推移</div>
+              <div style="font-size:11px; color:var(--text-dim);">--- 目標ペース（1日あたり83単位）</div>
+            </div>
+            <div class="chart-container" id="daily-chart">
+              <!-- JavaScriptで動的に生成 -->
+            </div>
+          </div>
+
+          <!-- ペース判定 + 残りペース -->
+          <div class="pace-box" id="pace-box">
+            <!-- JavaScriptで動的に生成 -->
+          </div>
+          <div class="pace-box" id="remaining-pace" style="background:var(--primary-light); border-color:#bfdbfe;">
+            <!-- JavaScriptで動的に生成: 残り営業日で必要なペース -->
+          </div>
+
+          <!-- 前日ハイライト -->
+          <div class="highlight-box" id="highlight-box">
+            <!-- JavaScriptで動的に生成 -->
+          </div>
+        </div>
+
+        <!-- ==========================================
+             [B] PT別実績一覧
+             ========================================== -->
+        <div class="page" id="page-staff">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div class="section-title">PT別実績 — 2026年4月</div>
+          </div>
+
+          <!-- PT別テーブル -->
+          <div class="table-wrap">
+            <table id="staff-table">
+              <thead>
+                <tr>
+                  <th>名前</th>
+                  <th class="text-right">単位数</th>
+                  <th class="text-right">目標</th>
+                  <th class="text-right">達成率</th>
+                  <th>達成状況</th>
+                  <th>直近3日</th>
+                  <th class="text-right">患者数</th>
+                  <th class="text-right">新規</th>
+                  <th class="text-right">計画書</th>
+                  <th class="text-right">ｷｬﾝｾﾙ</th>
+                  <th class="text-right">前月比</th>
+                  <th class="text-center">状態</th>
+                </tr>
+              </thead>
+              <tbody id="staff-tbody">
+                <!-- JavaScriptで動的に生成 -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:12px; font-size:11px; color:var(--text-dim);">
+            ★ 目標達成（≥100%）　▲ 要注目（&lt;80%）　行クリックで日別詳細を展開
+          </div>
+        </div>
+
+        <!-- ==========================================
+             [C] データ入力画面
+             ========================================== -->
+        <div class="page" id="page-input">
+          <div class="section-title">日次実績入力</div>
+
+          <div class="card">
+            <div class="form-grid">
+              <!-- PT選択 -->
+              <div class="form-group">
+                <label class="form-label">PT名 <span class="required">*</span></label>
+                <select class="form-select" id="input-staff">
+                  <option value="">選択してください</option>
+                </select>
+              </div>
+              <!-- 日付 -->
+              <div class="form-group">
+                <label class="form-label">日付 <span class="required">*</span></label>
+                <input type="date" class="form-input" id="input-date" value="2026-04-15">
+              </div>
+              <!-- 単位数 -->
+              <div class="form-group">
+                <label class="form-label">単位数 <span class="required">*</span></label>
+                <input type="number" class="form-input" id="input-units" min="0" max="99" placeholder="例: 18">
+              </div>
+              <!-- 実施患者数 -->
+              <div class="form-group">
+                <label class="form-label">実施患者数 <span class="required">*</span></label>
+                <input type="number" class="form-input" id="input-patients" min="0" max="50" placeholder="例: 5">
+              </div>
+              <!-- 新規患者数 -->
+              <div class="form-group">
+                <label class="form-label">新規患者数</label>
+                <input type="number" class="form-input" id="input-new" min="0" max="50" value="0">
+              </div>
+              <!-- 計画書数 -->
+              <div class="form-group">
+                <label class="form-label">計画書作成数</label>
+                <input type="number" class="form-input" id="input-plans" min="0" max="50" value="0">
+              </div>
+              <!-- キャンセル数 -->
+              <div class="form-group">
+                <label class="form-label">キャンセル件数</label>
+                <input type="number" class="form-input" id="input-cancel" min="0" max="50" value="0">
+              </div>
+              <!-- 空きスペーサー -->
+              <div class="form-group"></div>
+              <!-- 備考 -->
+              <div class="form-group full">
+                <label class="form-label">備考</label>
+                <textarea class="form-textarea" id="input-note" placeholder="例: 午後1件キャンセル、空き枠で山田さん前倒し実施"></textarea>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="saveRecord()">保存する</button>
+              <button class="btn btn-secondary" onclick="clearForm()">クリア</button>
+            </div>
+          </div>
+
+          <!-- 入力済み一覧 -->
+          <div class="record-list">
+            <div class="section-title">入力済み一覧（選択中のPT）</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日付</th>
+                    <th class="text-right">単位</th>
+                    <th class="text-right">患者</th>
+                    <th class="text-right">新規</th>
+                    <th class="text-right">計画</th>
+                    <th class="text-right">ｷｬﾝｾﾙ</th>
+                    <th>備考</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="input-history">
+                  <!-- JavaScriptで動的に生成 -->
+                </tbody>
+              </table>
+            </div>
+            <!-- 未入力日 -->
+            <div id="missing-dates" style="margin-top:12px;">
+              <!-- JavaScriptで動的に生成 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             [D] 朝礼サマリー画面
+             ========================================== -->
+        <div class="page" id="page-briefing">
+          <div class="section-title">朝礼サマリー</div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">基準日</label>
+                <input type="date" class="form-input" id="briefing-date" value="2026-04-15">
+              </div>
+              <button class="btn btn-primary" onclick="generateBriefing()" style="margin-top:18px;">
+                サマリーを生成
+              </button>
+            </div>
+          </div>
+
+          <!-- サマリー出力エリア -->
+          <div id="briefing-output" class="summary-output" style="display:none;">
+            <!-- JavaScriptで動的に生成 -->
+          </div>
+
+          <div style="margin-top:14px; display:flex; gap:10px;" id="briefing-actions" style="display:none;">
+            <button class="btn btn-primary copy-btn" onclick="copySummary()">
+              📋 テキストをコピー
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.content -->
+    </main>
+  </div>
+
+  <!-- コピー完了トースト -->
+  <div class="copy-toast" id="copy-toast">クリップボードにコピーしました</div>
+
+  <script>
+    /* ============================================
+       ダミーデータ
+
+       MVPではこのデータがDBの代わり。
+       本格版ではPrisma + SQLiteに置き換える。
+       ============================================ */
+
+    // --- PTマスタ（5名） ---
+    const STAFF = [
+      { id: 1, name: '田中', jobType: 'PT', isActive: true },
+      { id: 2, name: '佐藤', jobType: 'PT', isActive: true },
+      { id: 3, name: '鈴木', jobType: 'PT', isActive: true },
+      { id: 4, name: '山田', jobType: 'PT', isActive: true },
+      { id: 5, name: '木村', jobType: 'PT', isActive: true },
+    ];
+
+    // --- 施設情報 ---
+    const FACILITY = {
+      name: 'サンプル整形外科クリニック',
+      businessDays: 18,    // 4月の営業日数
+      yearMonth: '2026-04',
+    };
+
+    // --- 月次目標 ---
+    const TARGETS = {
+      total:  { units: 1500, patients: 210, newPatients: 30, plans: 25 },
+      byStaff: {
+        1: { units: 300, patients: 45, newPatients: 8, plans: 6 },
+        2: { units: 300, patients: 42, newPatients: 6, plans: 5 },
+        3: { units: 280, patients: 40, newPatients: 5, plans: 5 },
+        4: { units: 270, patients: 40, newPatients: 5, plans: 4 },
+        5: { units: 250, patients: 38, newPatients: 5, plans: 4 },
+      },
+    };
+
+    // --- 日次実績データ（4月1日〜14日、営業日のみ） ---
+    // 各PTの日ごとの実績
+    const DAILY_RECORDS = [
+      // 田中（好調・目標超過ペース）
+      { staffId:1, date:'2026-04-01', units:16, patients:5, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-02', units:18, patients:5, newPatients:1, plans:0, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-03', units:17, patients:5, newPatients:0, plans:1, cancel:1, note:'午前1件ｷｬﾝｾﾙ' },
+      { staffId:1, date:'2026-04-04', units:15, patients:4, newPatients:1, plans:0, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-07', units:18, patients:5, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-08', units:20, patients:6, newPatients:1, plans:0, cancel:0, note:'午後追加1名対応' },
+      { staffId:1, date:'2026-04-09', units:19, patients:6, newPatients:0, plans:1, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-10', units:20, patients:6, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:1, date:'2026-04-11', units:16, patients:4, newPatients:1, plans:0, cancel:1, note:'午後ｷｬﾝｾﾙ1件' },
+      { staffId:1, date:'2026-04-14', units:18, patients:5, newPatients:1, plans:1, cancel:0, note:'' },
+
+      // 佐藤（安定・やや目標未満）
+      { staffId:2, date:'2026-04-01', units:15, patients:4, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-02', units:16, patients:5, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:2, date:'2026-04-03', units:14, patients:4, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-04', units:15, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-07', units:16, patients:5, newPatients:0, plans:0, cancel:1, note:'午後ｷｬﾝｾﾙ' },
+      { staffId:2, date:'2026-04-08', units:15, patients:4, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-09', units:16, patients:5, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-10', units:15, patients:4, newPatients:0, plans:1, cancel:1, note:'' },
+      { staffId:2, date:'2026-04-11', units:14, patients:4, newPatients:1, plans:0, cancel:0, note:'' },
+      { staffId:2, date:'2026-04-14', units:16, patients:5, newPatients:0, plans:0, cancel:1, note:'' },
+
+      // 鈴木（苦戦・要フォロー）
+      { staffId:3, date:'2026-04-01', units:12, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:3, date:'2026-04-02', units:11, patients:3, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:3, date:'2026-04-03', units:10, patients:3, newPatients:0, plans:0, cancel:2, note:'午前午後各1件ｷｬﾝｾﾙ' },
+      { staffId:3, date:'2026-04-04', units:12, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:3, date:'2026-04-07', units:11, patients:3, newPatients:1, plans:1, cancel:1, note:'' },
+      { staffId:3, date:'2026-04-08', units:13, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:3, date:'2026-04-09', units:12, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:3, date:'2026-04-10', units:10, patients:3, newPatients:1, plans:1, cancel:2, note:'2件ｷｬﾝｾﾙ、空き時間で書類' },
+      { staffId:3, date:'2026-04-11', units:11, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:3, date:'2026-04-14', units:12, patients:3, newPatients:1, plans:0, cancel:0, note:'' },
+
+      // 山田（苦戦・やや低い）
+      { staffId:4, date:'2026-04-01', units:10, patients:3, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-02', units:11, patients:3, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-03', units:10, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:4, date:'2026-04-04', units:9,  patients:3, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-07', units:10, patients:3, newPatients:1, plans:0, cancel:1, note:'' },
+      { staffId:4, date:'2026-04-08', units:12, patients:4, newPatients:0, plans:1, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-09', units:11, patients:3, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-10', units:10, patients:3, newPatients:1, plans:1, cancel:1, note:'' },
+      { staffId:4, date:'2026-04-11', units:10, patients:3, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:4, date:'2026-04-14', units:11, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+
+      // 木村（安定）
+      { staffId:5, date:'2026-04-01', units:13, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-02', units:14, patients:4, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-03', units:12, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:5, date:'2026-04-04', units:13, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-07', units:13, patients:4, newPatients:1, plans:0, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-08', units:12, patients:3, newPatients:0, plans:1, cancel:1, note:'' },
+      { staffId:5, date:'2026-04-09', units:14, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-10', units:13, patients:4, newPatients:1, plans:1, cancel:0, note:'' },
+      { staffId:5, date:'2026-04-11', units:12, patients:3, newPatients:0, plans:0, cancel:1, note:'' },
+      { staffId:5, date:'2026-04-14', units:13, patients:4, newPatients:0, plans:0, cancel:0, note:'' },
+    ];
+
+    // --- 前月データ（3月・比較用サマリー） ---
+    const LAST_MONTH = {
+      1: { units: 290, patients: 43 },
+      2: { units: 275, patients: 40 },
+      3: { units: 220, patients: 33 },
+      4: { units: 195, patients: 29 },
+      5: { units: 225, patients: 34 },
+    };
+
+    // 営業日リスト（4月）
+    const BUSINESS_DAYS = [
+      '2026-04-01','2026-04-02','2026-04-03','2026-04-04',
+      '2026-04-07','2026-04-08','2026-04-09','2026-04-10','2026-04-11',
+      '2026-04-14','2026-04-15','2026-04-16','2026-04-17','2026-04-18',
+      '2026-04-21','2026-04-22','2026-04-23','2026-04-24',
+    ];
+
+    /* ============================================
+       ユーティリティ関数
+       ============================================ */
+
+    // 日付を「4/14(月)」形式にフォーマット
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      const days = ['日','月','火','水','木','金','土'];
+      return `${d.getMonth()+1}/${d.getDate()}(${days[d.getDay()]})`;
+    }
+
+    // 数値を3桁カンマ区切りに
+    function formatNum(n) {
+      return n.toLocaleString();
+    }
+
+    // パーセントの色分け
+    function getPercentColor(pct) {
+      if (pct >= 100) return 'var(--green)';
+      if (pct >= 80) return 'var(--primary)';
+      return 'var(--orange)';
+    }
+
+    // プログレスバーの色
+    function getProgressColor(pct) {
+      if (pct >= 100) return 'var(--green)';
+      if (pct >= 80) return 'var(--primary)';
+      return 'var(--orange)';
+    }
+
+    /* ============================================
+       集計ロジック
+       ============================================ */
+
+    // 特定PTの当月累計を計算
+    function getStaffTotal(staffId) {
+      const records = DAILY_RECORDS.filter(r => r.staffId === staffId);
+      return {
+        units: records.reduce((s,r) => s + r.units, 0),
+        patients: records.reduce((s,r) => s + r.patients, 0),
+        newPatients: records.reduce((s,r) => s + r.newPatients, 0),
+        plans: records.reduce((s,r) => s + r.plans, 0),
+        cancel: records.reduce((s,r) => s + r.cancel, 0),
+        days: records.length,
+      };
+    }
+
+    // 部門全体の当月累計を計算
+    function getDeptTotal() {
+      return {
+        units: DAILY_RECORDS.reduce((s,r) => s + r.units, 0),
+        patients: DAILY_RECORDS.reduce((s,r) => s + r.patients, 0),
+        newPatients: DAILY_RECORDS.reduce((s,r) => s + r.newPatients, 0),
+        plans: DAILY_RECORDS.reduce((s,r) => s + r.plans, 0),
+        cancel: DAILY_RECORDS.reduce((s,r) => s + r.cancel, 0),
+      };
+    }
+
+    // 特定日の全体合計
+    function getDayTotal(dateStr) {
+      const records = DAILY_RECORDS.filter(r => r.date === dateStr);
+      return {
+        units: records.reduce((s,r) => s + r.units, 0),
+        patients: records.reduce((s,r) => s + r.patients, 0),
+        newPatients: records.reduce((s,r) => s + r.newPatients, 0),
+        plans: records.reduce((s,r) => s + r.plans, 0),
+        cancel: records.reduce((s,r) => s + r.cancel, 0),
+      };
+    }
+
+    // 経過営業日数（基準日まで）
+    function getElapsedBusinessDays(baseDate) {
+      return BUSINESS_DAYS.filter(d => d < baseDate).length;
+    }
+
+    // キャンセル率を計算
+    function calcCancelRate(cancel, patients) {
+      if (patients + cancel === 0) return 0;
+      return (cancel / (patients + cancel) * 100);
+    }
+
+    // 直近N日のレコードを取得（日付降順でソート済み）
+    function getRecentRecords(staffId, n) {
+      return DAILY_RECORDS
+        .filter(r => r.staffId === staffId)
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, n);
+    }
+
+    // 直近3日のトレンドを判定（↗ ↘ →）
+    function getTrend(staffId) {
+      const recent = getRecentRecords(staffId, 3);
+      if (recent.length < 2) return { nums: recent.map(r => r.units), arrow: '→', cls: 'trend-flat' };
+
+      const nums = recent.map(r => r.units).reverse(); // 古い順に並べ替え
+      const first = nums[0];
+      const last = nums[nums.length - 1];
+      const diff = last - first;
+
+      let arrow, cls;
+      if (diff >= 2) { arrow = '↗'; cls = 'trend-up'; }
+      else if (diff <= -2) { arrow = '↘'; cls = 'trend-down'; }
+      else { arrow = '→'; cls = 'trend-flat'; }
+
+      return { nums, arrow, cls };
+    }
+
+    /* ============================================
+       ページナビゲーション
+       ============================================ */
+    const PAGE_TITLES = {
+      dashboard: 'ダッシュボード',
+      staff: 'PT別実績一覧',
+      input: 'データ入力',
+      briefing: '朝礼サマリー',
+    };
+
+    function navigateTo(pageId) {
+      // 全ページを非表示にし、選択されたページだけ表示
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+
+      // サイドバーのアクティブ状態を更新
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      // ヘッダータイトルを更新
+      document.getElementById('header-title').textContent = PAGE_TITLES[pageId];
+    }
+
+    /* ============================================
+       [A] ダッシュボード描画
+       ============================================ */
+    function renderDashboard() {
+      const total = getDeptTotal();
+      const target = TARGETS.total;
+      const cancelRate = calcCancelRate(total.cancel, total.patients);
+      const elapsed = getElapsedBusinessDays('2026-04-15');
+      const consumeRate = (elapsed / FACILITY.businessDays * 100);
+
+      // --- KPIカード ---
+      const kpis = [
+        {
+          label: '総単位数',
+          value: formatNum(total.units),
+          sub: `/ ${formatNum(target.units)}`,
+          pct: (total.units / target.units * 100).toFixed(1),
+        },
+        {
+          label: '実施患者数',
+          value: formatNum(total.patients),
+          sub: `/ ${formatNum(target.patients)}`,
+          pct: (total.patients / target.patients * 100).toFixed(1),
+        },
+        {
+          label: '新規患者数',
+          value: total.newPatients,
+          sub: `/ ${target.newPatients}`,
+          pct: (total.newPatients / target.newPatients * 100).toFixed(1),
+        },
+        {
+          label: '計画書数',
+          value: total.plans,
+          sub: `/ ${target.plans}`,
+          pct: (total.plans / target.plans * 100).toFixed(1),
+        },
+        {
+          label: 'キャンセル率',
+          value: cancelRate.toFixed(1) + '%',
+          sub: '前月 3.8%',
+          pct: null, // プログレスバーなし
+          isCancel: true,
+        },
+      ];
+
+      let cardsHtml = '';
+      kpis.forEach(kpi => {
+        if (kpi.isCancel) {
+          // キャンセル率は特別表示
+          const cancelColor = parseFloat(kpi.value) <= 3 ? 'var(--green)' :
+                              parseFloat(kpi.value) <= 6 ? 'var(--orange)' : 'var(--red)';
+          const trend = parseFloat(kpi.value) > 3.8 ? '▲ やや増加' : '✓ 改善';
+          cardsHtml += `
+            <div class="kpi-card">
+              <div class="kpi-label">${kpi.label}</div>
+              <div class="kpi-value" style="color:${cancelColor}">${kpi.value}</div>
+              <div class="kpi-sub">${kpi.sub}</div>
+              <div class="kpi-percent" style="color:${cancelColor}">${trend}</div>
+            </div>`;
+        } else {
+          const pct = parseFloat(kpi.pct);
+          const color = getProgressColor(pct);
+          cardsHtml += `
+            <div class="kpi-card">
+              <div class="kpi-label">${kpi.label}</div>
+              <div class="kpi-value">${kpi.value}</div>
+              <div class="kpi-sub">${kpi.sub}</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${color}"></div></div>
+              <div class="kpi-percent" style="color:${color}">${kpi.pct}%</div>
+            </div>`;
+        }
+      });
+      document.getElementById('kpi-cards').innerHTML = cardsHtml;
+
+      // --- 日別推移グラフ（CSS棒グラフ） ---
+      const dates = BUSINESS_DAYS.filter(d => d <= '2026-04-14');
+      const dailyTarget = Math.round(target.units / FACILITY.businessDays); // 1日あたり目標
+      const maxUnits = 120; // グラフの最大値
+
+      let chartHtml = `<div class="bar-chart">`;
+      dates.forEach(date => {
+        const dayTotal = getDayTotal(date);
+        const barHeight = Math.round(dayTotal.units / maxUnits * 130);
+        const barColor = dayTotal.units >= dailyTarget ? 'var(--primary)' : '#93c5fd';
+        chartHtml += `
+          <div class="bar-col">
+            <div class="bar-value">${dayTotal.units}</div>
+            <div class="bar" style="height:${barHeight}px; background:${barColor}" title="${formatDate(date)}: ${dayTotal.units}単位"></div>
+            <div class="bar-label">${formatDate(date).split('(')[0]}</div>
+          </div>`;
+      });
+      chartHtml += '</div>';
+      document.getElementById('daily-chart').innerHTML = chartHtml;
+
+      // --- ペース判定 ---
+      const unitsPct = (total.units / target.units * 100);
+      const diff = (unitsPct - consumeRate).toFixed(1);
+      const paceClass = diff >= 0 ? 'pace-good' : 'pace-warn';
+      const paceIcon = diff >= 0 ? '✓' : '▲';
+      const paceText = diff >= 0 ? 'やや前倒し' : 'やや遅れ';
+
+      document.getElementById('pace-box').innerHTML = `
+        <div class="pace-item">営業日消化率: <strong>${consumeRate.toFixed(1)}%</strong>（${elapsed}/${FACILITY.businessDays}日）</div>
+        <div class="pace-item">単位達成率: <strong>${unitsPct.toFixed(1)}%</strong></div>
+        <div class="pace-item ${paceClass}"><strong>${paceIcon} ${paceText}（${diff > 0 ? '+' : ''}${diff}pt）</strong></div>
+      `;
+
+      // --- 残りペース表示（提案1） ---
+      const remainingDays = FACILITY.businessDays - elapsed;
+      const remainingUnits = target.units - total.units;
+      const requiredPace = remainingDays > 0 ? Math.ceil(remainingUnits / remainingDays) : 0;
+      const currentAvg = Math.round(total.units / elapsed);
+      const gapPerDay = requiredPace - currentAvg;
+      const gapText = gapPerDay > 0
+        ? `<span style="color:var(--orange)">あと${gapPerDay}単位/日の上積みが必要</span>`
+        : `<span style="color:var(--green)">現在のペースを維持すれば目標到達</span>`;
+
+      document.getElementById('remaining-pace').innerHTML = `
+        <div class="pace-item">残り <strong>${remainingDays}営業日</strong></div>
+        <div class="pace-item">→ <span class="remaining-highlight">1日あたり${requiredPace}単位</span> ペースで目標到達</div>
+        <div class="pace-item">（現在の1日平均: ${currentAvg}単位 → ${gapText}）</div>
+      `;
+
+      // --- 前日ハイライト ---
+      const yesterday = '2026-04-14';
+      const ydayTotal = getDayTotal(yesterday);
+
+      // PT別で好調・注目を抽出
+      let highlights = [];
+      STAFF.forEach(st => {
+        const t = getStaffTotal(st.id);
+        const tgt = TARGETS.byStaff[st.id];
+        const pct = (t.units / tgt.units * 100);
+        if (pct >= 100) highlights.push(`<span style="color:var(--green)">★ ${st.name}PT: 達成率${pct.toFixed(1)}%（好調）</span>`);
+        else if (pct < 80) highlights.push(`<span style="color:var(--orange)">▲ ${st.name}PT: 達成率${pct.toFixed(1)}%（要フォロー）</span>`);
+      });
+
+      document.getElementById('highlight-box').innerHTML = `
+        <div class="highlight-title">前日ハイライト — ${formatDate(yesterday)}</div>
+        <div class="highlight-line">総単位数: <strong>${ydayTotal.units}</strong>（日次目標${dailyTarget} → ${ydayTotal.units >= dailyTarget ? '<span style="color:var(--green)">✓ 達成</span>' : '<span style="color:var(--orange)">▲ 未達</span>'}）/ 実施${ydayTotal.patients}名 / キャンセル${ydayTotal.cancel}件</div>
+        <div style="margin-top:8px">${highlights.join('<br>')}</div>
+      `;
+    }
+
+    /* ============================================
+       [B] PT別実績一覧描画
+       ============================================ */
+    function renderStaffTable() {
+      let rows = [];
+
+      STAFF.forEach(st => {
+        const t = getStaffTotal(st.id);
+        const tgt = TARGETS.byStaff[st.id];
+        const pct = (t.units / tgt.units * 100);
+        const lastMonth = LAST_MONTH[st.id];
+        // 前月比: 今月の1日平均 vs 前月の1日平均（前月は18営業日想定）
+        const avgNow = t.units / t.days;
+        const avgLast = lastMonth.units / 18;
+        const momPct = ((avgNow / avgLast - 1) * 100);
+
+        // 状態バッジ
+        let statusHtml = '';
+        if (pct >= 100) statusHtml = '<span class="badge badge-green">★ 達成</span>';
+        else if (pct < 80) statusHtml = '<span class="badge badge-orange">▲ 注目</span>';
+
+        // ミニバー
+        const barColor = getProgressColor(pct);
+        const barWidth = Math.min(pct, 100);
+
+        // 直近3日トレンド（提案2）
+        const trend = getTrend(st.id);
+        const trendHtml = `
+          <div class="trend-nums">
+            ${trend.nums.join(' → ')}
+            <span class="trend-arrow ${trend.cls}">${trend.arrow}</span>
+          </div>`;
+
+        rows.push(`
+          <tr class="clickable" onclick="toggleExpand(${st.id})">
+            <td class="font-bold">${st.name}</td>
+            <td class="text-right font-bold">${formatNum(t.units)}</td>
+            <td class="text-right">${formatNum(tgt.units)}</td>
+            <td class="text-right font-bold" style="color:${getPercentColor(pct)}">${pct.toFixed(1)}%</td>
+            <td>
+              <div class="mini-bar-wrap">
+                <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${barWidth}%;background:${barColor}"></div></div>
+              </div>
+            </td>
+            <td>${trendHtml}</td>
+            <td class="text-right">${formatNum(t.patients)}</td>
+            <td class="text-right">${t.newPatients}</td>
+            <td class="text-right">${t.plans}</td>
+            <td class="text-right">${t.cancel}</td>
+            <td class="text-right" style="color:${momPct >= 0 ? 'var(--green)' : 'var(--orange)'}">${momPct >= 0 ? '+' : ''}${momPct.toFixed(1)}%</td>
+            <td class="text-center">${statusHtml}</td>
+          </tr>
+          <tr class="expand-row" id="expand-${st.id}">
+            <td colspan="12" class="expand-cell">
+              <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;">日別推移（${st.name}）</div>
+              <div class="expand-daily" id="expand-daily-${st.id}"></div>
+            </td>
+          </tr>
+        `);
+      });
+
+      // 合計行
+      const total = getDeptTotal();
+      const totalPct = (total.units / TARGETS.total.units * 100);
+      rows.push(`
+        <tr style="background:#f8fafc; font-weight:600;">
+          <td>合計</td>
+          <td class="text-right">${formatNum(total.units)}</td>
+          <td class="text-right">${formatNum(TARGETS.total.units)}</td>
+          <td class="text-right" style="color:${getPercentColor(totalPct)}">${totalPct.toFixed(1)}%</td>
+          <td></td>
+          <td></td>
+          <td class="text-right">${formatNum(total.patients)}</td>
+          <td class="text-right">${total.newPatients}</td>
+          <td class="text-right">${total.plans}</td>
+          <td class="text-right">${total.cancel}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      `);
+
+      document.getElementById('staff-tbody').innerHTML = rows.join('');
+    }
+
+    // PT行の展開/折りたたみ
+    function toggleExpand(staffId) {
+      const row = document.getElementById('expand-' + staffId);
+      row.classList.toggle('open');
+
+      // 日別データを描画（初回のみ）
+      const container = document.getElementById('expand-daily-' + staffId);
+      if (container.innerHTML === '') {
+        const records = DAILY_RECORDS.filter(r => r.staffId === staffId).reverse();
+        container.innerHTML = records.map(r => `
+          <div class="expand-day">
+            <div class="expand-day-date">${formatDate(r.date)}</div>
+            <div class="expand-day-value">${r.units}</div>
+            <div style="font-size:10px;color:var(--text-dim)">${r.patients}名${r.cancel > 0 ? ' / ｷｬﾝ' + r.cancel : ''}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    /* ============================================
+       [C] データ入力画面
+       ============================================ */
+
+    // PT選択ドロップダウンを初期化
+    function initInputForm() {
+      const select = document.getElementById('input-staff');
+      STAFF.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.id;
+        opt.textContent = st.name;
+        select.appendChild(opt);
+      });
+
+      // PT選択時に入力済み一覧を更新
+      select.addEventListener('change', () => renderInputHistory());
+    }
+
+    // 入力済み一覧を描画
+    function renderInputHistory() {
+      const staffId = parseInt(document.getElementById('input-staff').value);
+      if (!staffId) {
+        document.getElementById('input-history').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:20px;">PTを選択してください</td></tr>';
+        document.getElementById('missing-dates').innerHTML = '';
+        return;
+      }
+
+      const records = DAILY_RECORDS.filter(r => r.staffId === staffId).reverse();
+      const inputDates = records.map(r => r.date);
+
+      // 入力済みレコード
+      let html = records.map(r => `
+        <tr>
+          <td>${formatDate(r.date)}</td>
+          <td class="text-right">${r.units}</td>
+          <td class="text-right">${r.patients}</td>
+          <td class="text-right">${r.newPatients}</td>
+          <td class="text-right">${r.plans}</td>
+          <td class="text-right">${r.cancel}</td>
+          <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${r.note || '-'}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="editRecord(${r.staffId},'${r.date}')">編集</button></td>
+        </tr>
+      `).join('');
+
+      document.getElementById('input-history').innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:20px;">入力データなし</td></tr>';
+
+      // 未入力日
+      const elapsed = BUSINESS_DAYS.filter(d => d <= '2026-04-14');
+      const missing = elapsed.filter(d => !inputDates.includes(d));
+      if (missing.length > 0) {
+        document.getElementById('missing-dates').innerHTML = missing.map(d =>
+          `<div class="record-status status-missing">✗ ${formatDate(d)} 未入力 <button class="btn btn-secondary" style="padding:2px 8px;font-size:11px;margin-left:6px;" onclick="fillDate('${d}')">入力する</button></div>`
+        ).join('');
+      } else {
+        document.getElementById('missing-dates').innerHTML =
+          '<div class="record-status status-done" style="margin-top:8px;">✓ 全営業日の入力が完了しています</div>';
+      }
+    }
+
+    // 未入力日をクリックしたとき、日付をセット
+    function fillDate(dateStr) {
+      document.getElementById('input-date').value = dateStr;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 編集ボタン（既存データをフォームにセット）
+    function editRecord(staffId, dateStr) {
+      const record = DAILY_RECORDS.find(r => r.staffId === staffId && r.date === dateStr);
+      if (!record) return;
+
+      document.getElementById('input-staff').value = staffId;
+      document.getElementById('input-date').value = dateStr;
+      document.getElementById('input-units').value = record.units;
+      document.getElementById('input-patients').value = record.patients;
+      document.getElementById('input-new').value = record.newPatients;
+      document.getElementById('input-plans').value = record.plans;
+      document.getElementById('input-cancel').value = record.cancel;
+      document.getElementById('input-note').value = record.note;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 保存処理（プロトタイプではメモリ上のデータを更新）
+    function saveRecord() {
+      const staffId = parseInt(document.getElementById('input-staff').value);
+      const date = document.getElementById('input-date').value;
+      const units = parseInt(document.getElementById('input-units').value);
+      const patients = parseInt(document.getElementById('input-patients').value);
+
+      // バリデーション
+      if (!staffId) { alert('PTを選択してください'); return; }
+      if (!date) { alert('日付を入力してください'); return; }
+      if (isNaN(units) || units < 0) { alert('単位数を正しく入力してください'); return; }
+      if (isNaN(patients) || patients < 0) { alert('実施患者数を正しく入力してください'); return; }
+
+      const newRecord = {
+        staffId,
+        date,
+        units,
+        patients,
+        newPatients: parseInt(document.getElementById('input-new').value) || 0,
+        plans: parseInt(document.getElementById('input-plans').value) || 0,
+        cancel: parseInt(document.getElementById('input-cancel').value) || 0,
+        note: document.getElementById('input-note').value,
+      };
+
+      // 既存レコードがあれば上書き、なければ追加
+      const existIdx = DAILY_RECORDS.findIndex(r => r.staffId === staffId && r.date === date);
+      if (existIdx >= 0) {
+        if (!confirm(`${formatDate(date)}のデータは入力済みです。上書きしますか？`)) return;
+        DAILY_RECORDS[existIdx] = newRecord;
+      } else {
+        DAILY_RECORDS.push(newRecord);
+      }
+
+      alert('保存しました');
+      clearForm();
+      renderInputHistory();
+      // ダッシュボードも更新
+      renderDashboard();
+      renderStaffTable();
+    }
+
+    // フォームクリア
+    function clearForm() {
+      document.getElementById('input-units').value = '';
+      document.getElementById('input-patients').value = '';
+      document.getElementById('input-new').value = '0';
+      document.getElementById('input-plans').value = '0';
+      document.getElementById('input-cancel').value = '0';
+      document.getElementById('input-note').value = '';
+    }
+
+    /* ============================================
+       [D] 朝礼サマリー生成
+       ============================================ */
+    function generateBriefing() {
+      const baseDate = document.getElementById('briefing-date').value;
+      const yesterday = BUSINESS_DAYS.filter(d => d < baseDate).pop();
+
+      if (!yesterday) {
+        alert('基準日の前日に営業日データがありません');
+        return;
+      }
+
+      const ydayTotal = getDayTotal(yesterday);
+      const total = getDeptTotal();
+      const target = TARGETS.total;
+      const elapsed = getElapsedBusinessDays(baseDate);
+      const consumeRate = (elapsed / FACILITY.businessDays * 100);
+      const unitsPct = (total.units / target.units * 100);
+      const dailyTarget = Math.round(target.units / FACILITY.businessDays);
+      const cancelRate = calcCancelRate(total.cancel, total.patients);
+      const remaining = FACILITY.businessDays - elapsed;
+
+      // ペース判定
+      const diff = unitsPct - consumeRate;
+      const paceText = diff >= 0 ? `✓ やや前倒し（+${diff.toFixed(1)}pt）` : `▲ やや遅れ（${diff.toFixed(1)}pt）`;
+
+      // 新規患者の残り必要数
+      const newRemaining = target.newPatients - total.newPatients;
+      const newPerDay = remaining > 0 ? (newRemaining / remaining).toFixed(1) : '-';
+
+      // PT別トピック
+      let ptTopics = [];
+      STAFF.forEach(st => {
+        const t = getStaffTotal(st.id);
+        const tgt = TARGETS.byStaff[st.id];
+        const pct = (t.units / tgt.units * 100);
+        if (pct >= 100) ptTopics.push(`・${st.name}: 達成率${pct.toFixed(1)}% ★ 好調維持`);
+        else if (pct < 80) ptTopics.push(`・${st.name}: 達成率${pct.toFixed(1)}% ▲ フォロー要`);
+      });
+
+      // 未入力者チェック
+      let missingPTs = [];
+      STAFF.forEach(st => {
+        const hasRecord = DAILY_RECORDS.some(r => r.staffId === st.id && r.date === yesterday);
+        if (!hasRecord) missingPTs.push(st.name);
+      });
+
+      // サマリーテキスト組み立て
+      let text = '';
+      text += `■ 昨日の実績（${formatDate(yesterday)}）\n`;
+      text += `・総単位数: ${ydayTotal.units}（日次目標${dailyTarget} → ${ydayTotal.units >= dailyTarget ? '✓達成' : '▲未達'}）\n`;
+      text += `・実施患者数: ${ydayTotal.patients}名\n`;
+      text += `・新規: ${ydayTotal.newPatients}名\n`;
+      text += `・キャンセル: ${ydayTotal.cancel}件\n`;
+      text += '\n';
+
+      text += `■ 月次進捗（4/1〜${formatDate(yesterday)}・${elapsed}営業日/${FACILITY.businessDays}営業日）\n`;
+      text += `・総単位数: ${formatNum(total.units)} / ${formatNum(target.units)}（${unitsPct.toFixed(1)}%）\n`;
+      text += `・営業日消化率: ${consumeRate.toFixed(1)}%\n`;
+      text += `・ペース判定: ${paceText}\n`;
+      text += `・新規患者: ${total.newPatients} / ${target.newPatients}名（${(total.newPatients/target.newPatients*100).toFixed(1)}%）\n`;
+      if (newRemaining > 0) {
+        text += `  → 残り${remaining}営業日で${newRemaining}名必要（${newPerDay}名/日ペース）\n`;
+      }
+      text += `・月次キャンセル率: ${cancelRate.toFixed(1)}%（前月3.8% → ${cancelRate > 3.8 ? '▲やや増加' : '✓改善'}）\n`;
+      text += '\n';
+
+      if (ptTopics.length > 0) {
+        text += `■ PT別トピック\n`;
+        text += ptTopics.join('\n') + '\n';
+        text += '\n';
+      }
+
+      if (missingPTs.length > 0) {
+        text += `■ 未入力者\n`;
+        text += missingPTs.map(n => `・${n}（${formatDate(yesterday)}分が未入力）`).join('\n') + '\n';
+        text += '\n';
+      }
+
+      // --- 今日のアクション提案（提案3） ---
+      // データから自動で1〜2行のアクションを導き出す
+      text += `■ 今日のアクション\n`;
+
+      const actions = [];
+
+      // アクション: 残りペースに基づく全体方針
+      const remainDays = FACILITY.businessDays - elapsed;
+      const remainUnits = target.units - total.units;
+      const reqPace = remainDays > 0 ? Math.ceil(remainUnits / remainDays) : 0;
+      const curAvg = Math.round(total.units / elapsed);
+      if (reqPace > curAvg) {
+        actions.push(`→ 目標到達には1日あたり${reqPace}単位が必要（現在平均${curAvg}単位）。1人あたり+${Math.ceil((reqPace - curAvg) / STAFF.length)}単位の意識を。`);
+      } else {
+        actions.push(`→ 現在のペースを維持すれば目標到達。質の高いリハ提供に集中。`);
+      }
+
+      // アクション: 新規患者が不足している場合
+      if (newRemaining > 0 && remaining > 0) {
+        actions.push(`→ 新規患者があと${newRemaining}名必要。午後の空き枠で初診対応の優先を検討。`);
+      }
+
+      // アクション: キャンセル率が上昇傾向の場合
+      if (cancelRate > 4.0) {
+        actions.push(`→ キャンセル率${cancelRate.toFixed(1)}%。予約リマインドの徹底と、キャンセル時の繰り上げ対応を確認。`);
+      }
+
+      // アクション: 要注目PTへのフォロー
+      const warnPTs = [];
+      STAFF.forEach(st => {
+        const t = getStaffTotal(st.id);
+        const tgt = TARGETS.byStaff[st.id];
+        if ((t.units / tgt.units * 100) < 75) warnPTs.push(st.name);
+      });
+      if (warnPTs.length > 0) {
+        actions.push(`→ ${warnPTs.join('・')}の達成率が低め。声かけ・スケジュール調整を検討。`);
+      }
+
+      text += actions.join('\n') + '\n';
+
+      // 表示
+      const output = document.getElementById('briefing-output');
+      output.style.display = 'block';
+      output.textContent = text;
+      document.getElementById('briefing-actions').style.display = 'flex';
+    }
+
+    // クリップボードにコピー
+    function copySummary() {
+      const text = document.getElementById('briefing-output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      }).catch(() => {
+        // フォールバック（file://では clipboard API が使えない場合あり）
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const toast = document.getElementById('copy-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
+
+    /* ============================================
+       初期化
+       ============================================ */
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();      // ダッシュボード描画
+      renderStaffTable();     // PT別実績描画
+      initInputForm();        // 入力フォーム初期化
+      renderInputHistory();   // 入力履歴描画
+    });
+  </script>
+</body>
+</html>
