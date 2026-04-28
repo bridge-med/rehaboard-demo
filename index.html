@@ -495,6 +495,294 @@ a { color: var(--shu); text-decoration: none; }
   .target-grid { grid-template-columns: repeat(2, 1fr); }
   .page-header { padding-top: 48px; }
 }
+
+/* ===== Patients(担当患者リスト) ===== */
+.patient-alert-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  .patient-alert-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.alert-card {
+  padding: 18px 16px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.alert-card.alert-red    { background: #FBE5DD; color: var(--red); border-color: #F0C0B0; }
+.alert-card.alert-orange { background: #FAEFD8; color: #B26B40; border-color: #E5C5A0; }
+.alert-card.alert-yellow { background: #FAF5DA; color: #806430; border-color: #D8C290; }
+.alert-card.alert-green  { background: #EFF2E4; color: var(--green); border-color: #C5D2A8; }
+.alert-num {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  font-family: var(--serif-en, 'Fraunces', serif);
+}
+.alert-label {
+  font-size: 11px;
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+.patient-status-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.patient-status-pill.tsuchu { background: #EFF2E4; color: var(--green); }
+.patient-status-pill.chudan { background: #FBE5DD; color: var(--red); }
+.patient-status-pill.shuryo { background: var(--paper-3, #EDE8DD); color: var(--dim); }
+.patient-status-pill.sotsugyo { background: #E8E5F2; color: #5e5e8e; }
+.demo-banner {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink, #0A0A0F);
+  color: #fff;
+  padding: 10px 16px;
+  text-align: center;
+  z-index: 999;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.demo-banner a { color: #FBBF24; text-decoration: underline; margin-left: 8px; }
+body.mode-demo .demo-banner { display: block; }
+body.mode-demo main { padding-bottom: 40px; }
+
+/* ===== KPI Help Modal ===== */
+.kpi-help-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,10,15,0.6);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.kpi-help-overlay.show { display: flex; }
+.kpi-help-modal {
+  background: var(--paper, #FAFAF7);
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.kpi-help-header {
+  padding: 18px 24px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.kpi-help-header h2 { margin: 0; font-size: 16px; font-weight: 700; }
+.kpi-help-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+.kpi-help-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.kpi-def-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.kpi-def-item:last-child { border-bottom: 0; }
+.kpi-def-num {
+  flex-shrink: 0;
+  width: 36px;
+  font-family: var(--serif-en, 'Fraunces', serif);
+  font-size: 24px;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--shu);
+}
+.kpi-def-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.kpi-def-content .kpi-def-desc {
+  font-size: 12px;
+  color: var(--ink-2, #2A2A35);
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+.kpi-def-good, .kpi-def-bad {
+  font-size: 11px;
+  margin-bottom: 4px;
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+.kpi-def-good { color: var(--green); }
+.kpi-def-bad { color: var(--red); }
+.kpi-def-good::before { content: '◯'; position: absolute; left: 0; }
+.kpi-def-bad::before { content: '×'; position: absolute; left: 0; }
+
+/* ===== Patient Modal(患者登録/編集) ===== */
+.patient-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,10,15,0.6);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.patient-modal-overlay.show { display: flex; }
+.patient-modal {
+  background: var(--paper, #FAFAF7);
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+.patient-modal-header {
+  padding: 16px 22px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.patient-modal-header h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.patient-modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+.patient-modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.patient-modal-body .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+@media (max-width: 600px) {
+  .patient-modal-body .form-grid { grid-template-columns: 1fr; }
+}
+.patient-modal-body .form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-2, #2A2A35);
+  margin-bottom: 4px;
+}
+.patient-modal-body .form-group label .req { color: var(--red); margin-left: 2px; }
+.patient-modal-body .form-group input,
+.patient-modal-body .form-group select,
+.patient-modal-body .form-group textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+}
+.patient-modal-body .form-group textarea { resize: vertical; min-height: 60px; }
+.patient-modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.patient-modal-section-title {
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--shu);
+  text-transform: uppercase;
+  margin: 24px 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.patient-modal-section-title:first-child { margin-top: 0; }
+.handover-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 600px) {
+  .handover-grid { grid-template-columns: 1fr; }
+}
+.handover-grid .form-group label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin-bottom: 3px !important;
+  color: var(--ink-3, #6E6E78) !important;
+}
+.handover-grid .form-group textarea,
+.handover-grid .form-group input {
+  padding: 6px 9px !important;
+  font-size: 12px !important;
+  min-height: 36px;
+}
+.handover-grid .form-group textarea { resize: vertical; }
+
+/* ===== Wizard(初回起動) ===== */
+.wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,15,0.6);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.wizard-overlay.show { display: flex; }
+.wizard-modal {
+  background: var(--paper, #FAFAF7);
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+}
+.wizard-header {
+  padding: 18px 24px;
+  background: var(--ink, #0A0A0F);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wizard-header h2 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; }
+.wizard-step { font-size: 11px; opacity: 0.7; letter-spacing: 0.12em; }
+.wizard-body { padding: 28px 26px; flex: 1; overflow-y: auto; }
+.wizard-step-panel h3 { margin: 0 0 10px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.wizard-step-panel p { margin: 0 0 24px 0; color: var(--dim, #6E6E78); font-size: 13px; line-height: 1.7; }
+.wizard-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wizard-choice label {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.wizard-choice label:hover { border-color: var(--ink, #0A0A0F); }
+.wizard-choice input[type="radio"] { margin-right: 10px; }
 </style>
 </head>
 <body>
@@ -537,6 +825,13 @@ a { color: var(--shu); text-decoration: none; }
       <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <path d="M12 2 L 12 5 M 12 19 L 12 22 M 2 12 L 5 12 M 19 12 L 22 12 M 5 5 L 7 7 M 17 17 L 19 19 M 5 19 L 7 17 M 17 7 L 19 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
     </symbol>
+    <!-- 担当患者(クリップボード風) -->
+    <symbol id="m-clipboard" viewBox="0 0 24 24">
+      <path d="M9 4h6 a1 1 0 0 1 1 1 v1 h-8 v-1 a1 1 0 0 1 1-1 z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M6 6 h12 v14 h-12 z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9 11 h6 M9 14 h6 M9 17 h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </symbol>
+
     <!-- 矢印 -->
     <symbol id="m-arrow-right" viewBox="0 0 32 16">
       <path d="M2 8.1 Q 10 8.3, 18 8 T 28 8 M 23 3 L 29 8 L 23 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -557,15 +852,18 @@ a { color: var(--shu); text-decoration: none; }
   <nav class="sidebar-nav">
     <div class="nav-section">Main · 主部</div>
     <div class="nav-item active" onclick="navigate('dashboard')"><span class="icon"><svg><use href="#m-dashboard"/></svg></span>ダッシュボード</div>
-    <div class="nav-item" onclick="navigate('pt-list')"><span class="icon"><svg><use href="#m-people"/></svg></span>PT実績一覧</div>
+    <div class="nav-item" onclick="navigate('pt-list')"><span class="icon"><svg><use href="#m-people"/></svg></span>セラピスト実績</div>
+    <div class="nav-item" onclick="navigate('patients')"><span class="icon"><svg><use href="#m-clipboard"/></svg></span>担当患者</div>
     <div class="nav-item" onclick="navigate('data-input')"><span class="icon"><svg><use href="#m-pen"/></svg></span>データ入力</div>
     <div class="nav-item" onclick="navigate('briefing')"><span class="icon"><svg><use href="#m-doc"/></svg></span>朝礼サマリー</div>
+    <div class="nav-item" onclick="navigate('monthly-review')"><span class="icon"><svg><use href="#m-target"/></svg></span>月次レビュー</div>
     <div class="nav-section">Settings · 管理</div>
     <div class="nav-item" onclick="navigate('targets')"><span class="icon"><svg><use href="#m-target"/></svg></span>目標設定</div>
     <div class="nav-item" onclick="navigate('settings')"><span class="icon"><svg><use href="#m-gear"/></svg></span>設定</div>
   </nav>
   <div class="sidebar-foot">
-    BRIDGE<span style="color:var(--shu)">.</span> / v2.0<br>
+    BRIDGE<span style="color:var(--shu)">.</span> / v3.0<br>
+    <a href="#" onclick="openKpiHelp(); return false;">KPI辞書を見る →</a><br>
     <a href="https://bridge-med.github.io/bridge-lp/" target="_blank">他プロダクトを見る →</a>
   </div>
 </aside>
@@ -623,7 +921,7 @@ a { color: var(--shu); text-decoration: none; }
 <!-- ==================== PT LIST ==================== -->
 <div class="page" id="page-pt-list">
   <div class="page-header">
-    <h2 data-ch="02">PT実績一覧</h2>
+    <h2 data-ch="02">セラピスト実績</h2>
     <div class="month-selector">
       <button onclick="changeMonth(-1)">◀</button>
       <select id="monthSelect2" onchange="setMonth(this.value)"></select>
@@ -644,6 +942,59 @@ a { color: var(--shu); text-decoration: none; }
   </div>
 </div>
 
+<!-- ==================== PATIENTS(担当患者リスト) ==================== -->
+<div class="page" id="page-patients">
+  <div class="page-header">
+    <h2 data-ch="03">担当患者リスト</h2>
+    <button class="btn btn-primary" onclick="addPatientDialog()">+ 患者追加</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">残日数アラート(算定起算日 + 150日 を上限とした目安)</div>
+    <div id="patientAlertGrid" class="patient-alert-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">セラピスト別 担当者サマリー</div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr><th>担当</th><th>担当患者数</th><th>通院中</th><th>中断</th><th>残30日以下</th><th>合計頻度(週)</th></tr>
+        </thead>
+        <tbody id="patientSummaryBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:12px;">
+      <span class="card-title" style="margin-bottom:0;">担当患者一覧</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="patientFilterPt" onchange="renderPatients()" title="担当者で絞り込み"></select>
+        <select id="patientFilterStatus" onchange="renderPatients()">
+          <option value="">全状態</option>
+          <option value="通院中">通院中のみ</option>
+          <option value="中断">中断のみ</option>
+          <option value="終了">終了のみ</option>
+          <option value="卒業">卒業のみ</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table" id="patientTable">
+        <thead>
+          <tr>
+            <th>患者ID</th><th>性別</th><th>年齢</th><th>保険</th>
+            <th>主疾患</th><th>初回介入日</th><th>起算日</th><th>残日数</th>
+            <th>頻度</th><th>担当</th><th>状態</th><th>主訴</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="patientTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== DATA INPUT ==================== -->
 <div class="page" id="page-data-input">
   <div class="page-header">
@@ -653,7 +1004,7 @@ a { color: var(--shu); text-decoration: none; }
     <div class="card-title">実績入力</div>
     <div class="form-grid" style="margin-bottom:16px;">
       <div class="form-group">
-        <label>PT選択</label>
+        <label>セラピスト選択</label>
         <select id="inputPt"></select>
       </div>
       <div class="form-group">
@@ -680,7 +1031,7 @@ a { color: var(--shu); text-decoration: none; }
     <div style="overflow-x:auto;">
       <table class="data-table" id="inputHistoryTable">
         <thead>
-          <tr><th>日付</th><th>PT</th><th>単位数</th><th>患者数</th><th>新規</th><th>計画書</th><th>キャンセル</th><th>備考</th><th>操作</th></tr>
+          <tr><th>日付</th><th>担当</th><th>単位数</th><th>患者数</th><th>新規</th><th>計画書</th><th>キャンセル</th><th>備考</th><th>操作</th></tr>
         </thead>
         <tbody id="inputHistoryBody"></tbody>
       </table>
@@ -707,8 +1058,111 @@ a { color: var(--shu); text-decoration: none; }
         <label>&nbsp;</label>
         <button class="btn btn-secondary" onclick="copyBriefing()">クリップボードにコピー</button>
       </div>
+      <div class="form-group" style="flex:0 0 auto;">
+        <label>&nbsp;</label>
+        <button class="btn btn-secondary" onclick="printBriefing()">印刷</button>
+      </div>
     </div>
     <div class="briefing-text" id="briefingText">日付を選択して「生成」をクリックしてください。</div>
+  </div>
+</div>
+
+<!-- ==================== MONTHLY REVIEW ==================== -->
+<div class="page" id="page-monthly-review">
+  <div class="page-header">
+    <h2 data-ch="06">月次レビュー</h2>
+    <div class="month-selector">
+      <button onclick="changeMonth(-1)">◀</button>
+      <select id="monthSelect4" onchange="setMonth(this.value)"></select>
+      <button onclick="changeMonth(1)">▶</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">1. 今月の数字</div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>指標</th><th>今月</th><th>先月</th><th>月次目標</th><th>差分</th></tr></thead>
+        <tbody id="reviewMetricsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">2. 良かった点(自由記述・3項目以内)</div>
+    <textarea id="reviewGood" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;" placeholder="例: 新患が前月比+19%で増えた。初回時の説明資料を変えてから、患者から質問が増えた"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">3. 詰まりポイント</div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th style="width:30%">詰まり</th><th style="width:25%">数字の動き</th><th>思い当たる要因</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><input type="text" id="reviewBlock1" placeholder="例: 2回目移行率が低下"></td>
+            <td><input type="text" id="reviewBlockNum1" placeholder="72% → 65%"></td>
+            <td><input type="text" id="reviewBlockReason1" placeholder="初回後の予約取り直し運用が変わった"></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="reviewBlock2" placeholder=""></td>
+            <td><input type="text" id="reviewBlockNum2" placeholder=""></td>
+            <td><input type="text" id="reviewBlockReason2" placeholder=""></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="reviewBlock3" placeholder=""></td>
+            <td><input type="text" id="reviewBlockNum3" placeholder=""></td>
+            <td><input type="text" id="reviewBlockReason3" placeholder=""></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4. 来月の改善アクション(1つに絞る)</div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label>アクション</label>
+        <textarea id="reviewAction" rows="2" placeholder="例: 初回リハ後、その場で次回予約を取る運用に統一する"></textarea>
+      </div>
+      <div class="form-group">
+        <label>担当</label>
+        <input type="text" id="reviewActionOwner" placeholder="リーダー / 主任PT 等">
+      </div>
+      <div class="form-group">
+        <label>測る指標</label>
+        <input type="text" id="reviewActionMetric" placeholder="2回目移行率(60日後の確定値)">
+      </div>
+      <div class="form-group">
+        <label>期限</label>
+        <input type="text" id="reviewActionDue" placeholder="次回レビューまでに効果確認">
+      </div>
+      <div class="form-group">
+        <label>中止条件</label>
+        <input type="text" id="reviewActionStop" placeholder="患者から負担感の声が出たら見直し">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">5. スタッフへの共有文言(朝礼で読み上げる用)</div>
+    <textarea id="reviewShare" rows="6" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;" placeholder="数字は責めるためじゃなくて、部門の流れを整えるためにある — というスタンスを毎月言葉に残す"></textarea>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveReview()">保存</button>
+      <button class="btn btn-secondary" onclick="generateDirectorReport()">院長報告を生成</button>
+      <button class="btn btn-secondary" onclick="printDirectorReport()">院長報告を印刷</button>
+    </div>
+  </div>
+
+  <div class="card" id="directorReportCard">
+    <div class="card-title">6. 院長報告(A4 1ページ用)</div>
+    <div id="directorReportBody" style="font-family:'Noto Serif JP',serif;color:var(--dim);font-size:13px;line-height:1.8;">
+      上の「院長報告を生成」をクリックすると、ここに A4 1ページ分のレポートが生成されます。
+    </div>
   </div>
 </div>
 
@@ -729,7 +1183,7 @@ a { color: var(--shu); text-decoration: none; }
   </div>
 
   <div class="card">
-    <div class="card-title">PT別目標</div>
+    <div class="card-title">セラピスト別目標</div>
     <div style="overflow-x:auto;">
       <table class="data-table" id="ptTargetTable">
         <thead><tr><th>名前</th><th>単位数</th><th>患者数</th><th>新規</th><th>計画書</th></tr></thead>
@@ -762,18 +1216,224 @@ a { color: var(--shu); text-decoration: none; }
 
   <div class="card settings-section">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div class="card-title" style="margin-bottom:0;">PTマスタ</div>
-      <button class="btn btn-primary btn-sm" onclick="addPtDialog()">+ 追加</button>
+      <div class="card-title" style="margin-bottom:0;">セラピスト名簿</div>
+      <button class="btn btn-primary btn-sm" onclick="addPtDialog()">+ セラピスト追加</button>
     </div>
     <div id="ptMasterList"></div>
+  </div>
+
+  <div class="card settings-section">
+    <div class="card-title">データ管理</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn btn-secondary" onclick="exportData()">JSON エクスポート</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">JSON インポート</button>
+      <button class="btn btn-secondary" onclick="resetAllData()" style="margin-left:auto;color:var(--red);">全データリセット</button>
+    </div>
+    <p style="font-size:11px;color:var(--dim);margin:0;line-height:1.6;">
+      <strong>エクスポート:</strong> 現在の全データ(施設・PT・目標・実績・担当患者・月次レビュー)を JSON で書き出し、別端末への移行や定期バックアップに使えます。<br>
+      <strong>インポート:</strong> 書き出した JSON を読み込んで状態を復元します。<br>
+      <strong>リセット:</strong> 全データをクリアして初期状態に戻します(取り消し不可)。
+    </p>
+  </div>
+
+  <div class="card settings-section" id="licenseInfoCard" style="display:none;">
+    <div class="card-title">ライセンス情報</div>
+    <p style="font-size:12px;color:var(--ink-2);margin:0;">
+      フル機能版で稼働中です。データはこのブラウザの LocalStorage に保存されています。<br>
+      機種変更時は「JSON エクスポート」でバックアップ→新ブラウザで「JSON インポート」してください。
+    </p>
   </div>
 </div>
 
 </main>
 
+<!-- ==================== DEMO BANNER ==================== -->
+<div class="demo-banner">
+  Demo Mode — データはリロードで消えます。<a href="https://bridge-med.github.io/bridge-lp/#starter-kits" target="_blank">フル機能版を購入する(¥2,980)</a>
+</div>
+
+<!-- ==================== KPI HELP MODAL ==================== -->
+<div class="kpi-help-overlay" id="kpiHelpOverlay" onclick="if(event.target===this)closeKpiHelp()">
+  <div class="kpi-help-modal">
+    <div class="kpi-help-header">
+      <h2>KPI 辞書(全 19 指標)</h2>
+      <button class="kpi-help-close" onclick="closeKpiHelp()" aria-label="閉じる">×</button>
+    </div>
+    <div class="kpi-help-body" id="kpiHelpBody"></div>
+  </div>
+</div>
+
+<!-- ==================== PATIENT MODAL(患者登録/編集) ==================== -->
+<div class="patient-modal-overlay" id="patientModalOverlay" onclick="if(event.target===this)closePatientModal()">
+  <div class="patient-modal">
+    <div class="patient-modal-header">
+      <h2 id="patientModalTitle">患者登録</h2>
+      <button class="patient-modal-close" onclick="closePatientModal()" aria-label="閉じる">×</button>
+    </div>
+    <div class="patient-modal-body">
+      <div class="patient-modal-section-title">基本情報</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>患者ID<span class="req">*</span></label>
+          <input type="text" id="pmId" placeholder="例: P-2026-001">
+        </div>
+        <div class="form-group">
+          <label>担当セラピスト<span class="req">*</span></label>
+          <select id="pmPtId"></select>
+        </div>
+        <div class="form-group">
+          <label>性別</label>
+          <select id="pmSex"><option value="">-</option><option value="男">男</option><option value="女">女</option></select>
+        </div>
+        <div class="form-group">
+          <label>年齢</label>
+          <input type="text" id="pmAgeGroup">
+        </div>
+        <div class="form-group">
+          <label>保険</label>
+          <select id="pmInsurance">
+            <option value="">-</option>
+            <option value="国保">国保</option>
+            <option value="社保">社保</option>
+            <option value="後期">後期</option>
+            <option value="自費">自費</option>
+            <option value="労災">労災</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>主疾患</label>
+          <input type="text" id="pmCategory" placeholder="例: 右膝OA、L4/5椎間板ヘルニア">
+        </div>
+        <div class="form-group">
+          <label>初回介入日</label>
+          <input type="date" id="pmInitDate">
+        </div>
+        <div class="form-group">
+          <label>起算日(残日数の起点)</label>
+          <input type="date" id="pmStartDate">
+        </div>
+        <div class="form-group">
+          <label>頻度(週X回)</label>
+          <input type="number" id="pmFreq" min="0" max="7" value="1">
+        </div>
+        <div class="form-group">
+          <label>状態</label>
+          <select id="pmStatus">
+            <option value="通院中">通院中</option>
+            <option value="中断">中断</option>
+            <option value="終了">終了</option>
+            <option value="卒業">卒業</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="patient-modal-section-title">申し送り</div>
+      <div class="handover-grid">
+        <div class="form-group" style="grid-column: 1 / -1;"><label>主訴</label><textarea id="pmHvMain" rows="2" placeholder="例: 右膝の痛みで階段昇降が困難"></textarea></div>
+        <div class="form-group"><label>疼痛部位</label><textarea id="pmHvPainSite" rows="2" placeholder="例: 右膝内側"></textarea></div>
+        <div class="form-group"><label>疼痛 NRS</label><input type="text" id="pmHvNRS" placeholder="例: 6/10(歩行時)"></div>
+        <div class="form-group"><label>ROM 制限</label><textarea id="pmHvROM" rows="2" placeholder="例: 右膝屈曲 110°"></textarea></div>
+        <div class="form-group"><label>筋力低下</label><textarea id="pmHvMuscle" rows="2" placeholder="例: 右大腿四頭筋 MMT3"></textarea></div>
+        <div class="form-group" style="grid-column: 1 / -1;"><label>ADL 上の困りごと</label><textarea id="pmHvADL" rows="2" placeholder="例: 階段昇降、長時間歩行、和式トイレ"></textarea></div>
+        <div class="form-group"><label>禁忌 / 注意動作</label><textarea id="pmHvTaboo" rows="2" placeholder="例: 深屈曲・正座 NG"></textarea></div>
+        <div class="form-group"><label>痛みが出やすい動き</label><textarea id="pmHvPainTrigger" rows="2" placeholder="例: 階段降り、長時間立位"></textarea></div>
+        <div class="form-group"><label>転倒リスク</label><textarea id="pmHvFall" rows="2" placeholder="例: 中(直近半年で 1回)"></textarea></div>
+        <div class="form-group"><label>血圧・めまい・ふらつき</label><textarea id="pmHvBP" rows="2" placeholder="例: 起立性めまいあり、開始前バイタル要"></textarea></div>
+        <div class="form-group"><label>医師からの指示</label><textarea id="pmHvDoctor" rows="2" placeholder="例: 荷重制限なし、運動療法可"></textarea></div>
+        <div class="form-group"><label>その他注意</label><textarea id="pmHvOther" rows="2" placeholder="例: 補聴器使用、声かけ大きめ"></textarea></div>
+      </div>
+    </div>
+    <div class="patient-modal-footer">
+      <button class="btn btn-secondary" onclick="closePatientModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="savePatientFromModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== WIZARD(初回起動・商品版) ==================== -->
+<div class="wizard-overlay" id="wizardOverlay">
+  <div class="wizard-modal">
+    <div class="wizard-header">
+      <h2>RehaBoard へようこそ — 初期設定</h2>
+      <span class="wizard-step">ステップ <span id="wizardStepNum">1</span> / 4</span>
+    </div>
+    <div class="wizard-body">
+      <div class="wizard-step-panel" id="wizard-step-1">
+        <h3>1. 施設情報</h3>
+        <p>施設名を入力してください。後から「設定」画面で変更できます。</p>
+        <div class="form-group">
+          <label>施設名</label>
+          <input type="text" id="wizFacility" placeholder="例: BRIDGE整形外科クリニック">
+        </div>
+      </div>
+
+      <div class="wizard-step-panel" id="wizard-step-2" style="display:none;">
+        <h3>2. PT 名簿</h3>
+        <p>担当 PT の名前を入力してください。実名・略称どちらでも構いません(院内管理なので、好きな表記で)。</p>
+        <div id="wizPtList"></div>
+      </div>
+
+      <div class="wizard-step-panel" id="wizard-step-3" style="display:none;">
+        <h3>3. 当月の目標</h3>
+        <p>当月の部門目標を設定してください。月の途中で変更したい時は「目標設定」画面でいつでも変えられます。</p>
+        <div class="form-grid">
+          <div class="form-group"><label>総単位数</label><input type="number" id="wizTargetUnits" placeholder="1500"></div>
+          <div class="form-group"><label>患者数</label><input type="number" id="wizTargetPatients" placeholder="120"></div>
+          <div class="form-group"><label>新規患者数</label><input type="number" id="wizTargetNew" placeholder="20"></div>
+          <div class="form-group"><label>計画書数</label><input type="number" id="wizTargetPlans" placeholder="18"></div>
+        </div>
+      </div>
+
+      <div class="wizard-step-panel" id="wizard-step-4" style="display:none;">
+        <h3>4. サンプルデータ</h3>
+        <p>動作確認用のサンプルデータが入っています。実運用で使う場合は削除してから始めるのがおすすめです。</p>
+        <div class="wizard-choice">
+          <label><input type="radio" name="wizSample" value="keep" checked> サンプルを残して始める(後で「設定」から削除可能)</label>
+          <label><input type="radio" name="wizSample" value="clear"> サンプルを削除して、空の状態から始める</label>
+        </div>
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <button class="btn btn-secondary" id="wizPrev" onclick="wizardPrev()" style="display:none;">戻る</button>
+      <div style="flex:1;"></div>
+      <button class="btn btn-secondary" onclick="wizardSkip()">スキップ</button>
+      <button class="btn btn-primary" id="wizNext" onclick="wizardNext()">次へ</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+// ===================================================================
+// MODE & LICENSE
+// ===================================================================
+function validateLicense(key) {
+  // 簡易検証: RB2026- プレフィックス + 英数8文字以上
+  return /^RB2026-[A-Za-z0-9]{8,}$/.test(key || '');
+}
+
+const MODE = (() => {
+  try {
+    const params = new URLSearchParams(location.search);
+    const fromUrl = params.get('license');
+    if (fromUrl && validateLicense(fromUrl)) {
+      localStorage.setItem('rb_license', fromUrl);
+      // クリーンURL化(ライセンスキーをURLから消す)
+      history.replaceState({}, '', location.pathname);
+      return 'product';
+    }
+    const stored = localStorage.getItem('rb_license');
+    if (stored && validateLicense(stored)) return 'product';
+  } catch (e) { /* localStorage が使えない環境の保険 */ }
+  return 'demo';
+})();
+
+const IS_PRODUCT = (MODE === 'product');
+const IS_DEMO = !IS_PRODUCT;
+
 // ===================================================================
 // DATA
 // ===================================================================
@@ -893,6 +1553,102 @@ function getBusinessDates(year, month, total, limit) {
 let dailyData = generateDailyData();
 
 // ===================================================================
+// PATIENTS(担当患者リスト)
+// ===================================================================
+window.patients = window.patients || [];
+window.reviews = window.reviews || {};
+
+function generateSamplePatients() {
+  // 既に何か入ってるなら触らない
+  if (window.patients && window.patients.length > 0) return;
+  const cats = ['膝OA', '腰部脊柱管', '肩', '頚椎', '股関節', '足関節', 'スポーツ', '骨折', '術後'];
+  const ages = ['60代以下', '60代', '70代', '80代以上'];
+  const ins = ['国保', '社保', '後期', '社保', '国保', '後期'];
+  const sexes = ['男', '女'];
+  const freqs = [1, 2, 1, 2, 1];
+  const statuses = ['通院中', '通院中', '通院中', '通院中', '中断'];
+  const arr = [];
+  let pid = 1;
+  PTS.forEach((pt) => {
+    const count = 6;  // PT あたり6名(デモ版でも見栄え)
+    for (let i = 0; i < count; i++) {
+      const dayOffset = -(40 + ((pid * 11) % 110));
+      const initDate = new Date();
+      initDate.setDate(initDate.getDate() + dayOffset);
+      const iso = initDate.toISOString().slice(0, 10);
+      arr.push({
+        id: `P-2026-${String(pid).padStart(3, '0')}`,
+        ptId: pt.id,
+        sex: sexes[pid % 2],
+        ageGroup: ages[(pid + i) % ages.length],
+        insurance: ins[i % ins.length],
+        category: cats[(pid + i) % cats.length],
+        initDate: iso,
+        startDate: iso,
+        freq: freqs[i % freqs.length],
+        status: statuses[i % statuses.length],
+        note: '',
+      });
+      pid++;
+    }
+  });
+  window.patients = arr;
+}
+generateSamplePatients();
+
+// ===================================================================
+// PERSISTENCE(商品版のみ LocalStorage に保存)
+// ===================================================================
+const STORAGE_KEY = 'rb_state_v1';
+
+function saveState() {
+  if (!IS_PRODUCT) return;
+  try {
+    const state = {
+      MONTHS,
+      PTS,
+      deptTargets,
+      ptTargets,
+      ptDetailTargets,
+      dailyData,
+      facilityName: document.getElementById('facilityName')?.value || '',
+      patients: window.patients || [],  // 担当患者リスト(Phase 1A で追加)
+      reviews: window.reviews || {},     // 月次レビュー(Phase 1B で追加)
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { console.warn('saveState failed', e); }
+}
+
+function loadState() {
+  if (!IS_PRODUCT) return false;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (s.MONTHS) { MONTHS.length = 0; s.MONTHS.forEach(m => MONTHS.push(m)); }
+    if (s.PTS) { PTS.length = 0; s.PTS.forEach(p => PTS.push(p)); }
+    if (s.deptTargets) { Object.keys(deptTargets).forEach(k => delete deptTargets[k]); Object.assign(deptTargets, s.deptTargets); }
+    if (s.ptTargets) { Object.keys(ptTargets).forEach(k => delete ptTargets[k]); Object.assign(ptTargets, s.ptTargets); }
+    if (s.ptDetailTargets) { Object.keys(ptDetailTargets).forEach(k => delete ptDetailTargets[k]); Object.assign(ptDetailTargets, s.ptDetailTargets); }
+    if (s.dailyData) { Object.keys(dailyData).forEach(k => delete dailyData[k]); Object.assign(dailyData, s.dailyData); }
+    if (s.facilityName) {
+      const el = document.getElementById('facilityName');
+      if (el) el.value = s.facilityName;
+    }
+    if (s.patients) window.patients = s.patients;
+    if (s.reviews) window.reviews = s.reviews;
+    return true;
+  } catch (e) {
+    console.warn('loadState failed', e);
+    return false;
+  }
+}
+
+function clearStorage() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+
+// ===================================================================
 // NAVIGATION
 // ===================================================================
 function navigate(page) {
@@ -916,8 +1672,10 @@ function toggleSidebar() {
 function renderCurrentPage(page) {
   if (page === 'dashboard') renderDashboard();
   else if (page === 'pt-list') renderPtList();
+  else if (page === 'patients') renderPatientPage();
   else if (page === 'data-input') renderDataInput();
   else if (page === 'briefing') renderBriefingPage();
+  else if (page === 'monthly-review') renderMonthlyReviewPage();
   else if (page === 'targets') renderTargets();
   else if (page === 'settings') renderSettings();
 }
@@ -926,7 +1684,7 @@ function renderCurrentPage(page) {
 // MONTH SELECTOR
 // ===================================================================
 function initMonthSelectors() {
-  ['monthSelect', 'monthSelect2', 'monthSelect3'].forEach(id => {
+  ['monthSelect', 'monthSelect2', 'monthSelect3', 'monthSelect4'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     sel.innerHTML = '';
@@ -1440,9 +2198,12 @@ function saveInput() {
   ['inputUnits','inputPatients','inputNew','inputPlans','inputCancel'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('inputNotes').value = '';
 
-  toast('保存しました');
+  toast(IS_PRODUCT ? '保存しました' : 'デモ版: リロードで消えます');
+  saveState();
   updateMissingDates();
   renderInputHistory();
+  // ダッシュボード等の再描画(active page を更新)
+  renderAll();
 }
 
 function renderInputHistory() {
@@ -1695,7 +2456,8 @@ function saveTargets() {
     if (newInput) ptDetailTargets[mKey][pt.id].newPt = parseInt(newInput.value) || 0;
     if (planInput) ptDetailTargets[mKey][pt.id].plans = parseInt(planInput.value) || 0;
   });
-  toast('目標を保存しました');
+  toast(IS_PRODUCT ? '目標を保存しました' : 'デモ版: リロードで消えます');
+  saveState();
   renderTargets();
 }
 
@@ -1704,6 +2466,10 @@ function saveTargets() {
 // ===================================================================
 function renderSettings() {
   document.getElementById('businessDays').value = cm().bizDays;
+
+  // 商品版のみライセンス情報カードを表示
+  const licCard = document.getElementById('licenseInfoCard');
+  if (licCard) licCard.style.display = IS_PRODUCT ? 'block' : 'none';
 
   const list = document.getElementById('ptMasterList');
   list.innerHTML = PTS.map((pt, i) => `
@@ -1726,6 +2492,7 @@ function editPt(idx) {
   const newName = prompt('名前を入力:', pt.name);
   if (newName && newName.trim()) {
     PTS[idx].name = newName.trim();
+    saveState();
     renderSettings();
     toast('更新しました');
   }
@@ -1733,11 +2500,17 @@ function editPt(idx) {
 
 function togglePt(idx) {
   PTS[idx].active = !PTS[idx].active;
+  saveState();
   renderSettings();
   toast(PTS[idx].active ? '有効化しました' : '無効化しました');
 }
 
 function addPtDialog() {
+  // デモ版は PT 上限 5 名(現状の既定数)
+  if (IS_DEMO && PTS.filter(p => p.active).length >= 5) {
+    toast('デモ版は PT 5名まで。フル機能版で制限解除されます');
+    return;
+  }
   const name = prompt('新規PT名を入力:');
   if (!name || !name.trim()) return;
   const id = 'pt_' + Date.now();
@@ -1748,8 +2521,901 @@ function addPtDialog() {
     if (!ptDetailTargets[m.key][id]) ptDetailTargets[m.key][id] = { patients: 0, newPt: 0, plans: 0 };
     if (!dailyData[m.key][id]) dailyData[m.key][id] = [];
   });
+  saveState();
   renderSettings();
   toast('追加しました');
+}
+
+// ===================================================================
+// PATIENTS(担当患者リスト)
+// ===================================================================
+const ALERT_DAYS = 30;          // 残日数アラート閾値
+const STARTDATE_LIMIT_DAYS = 150; // 起算日 + 150日 を上限の目安(整形運動器)
+
+function getDaysLeft(p) {
+  if (!p || !p.startDate) return null;
+  const start = new Date(p.startDate + 'T00:00:00');
+  if (isNaN(start.getTime())) return null;
+  const limit = new Date(start);
+  limit.setDate(limit.getDate() + STARTDATE_LIMIT_DAYS);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.floor((limit - today) / (1000 * 60 * 60 * 24));
+}
+
+function renderPatientPage() {
+  // フィルタの PT セレクタ初期化
+  const ptSel = document.getElementById('patientFilterPt');
+  if (ptSel) {
+    const cur = ptSel.value || '';
+    ptSel.innerHTML = '<option value="">全PT</option>' +
+      PTS.filter(p => p.active).map(p => `<option value="${p.id}"${p.id===cur?' selected':''}>${p.name}</option>`).join('');
+  }
+  renderPatientAlerts();
+  renderPatientSummary();
+  renderPatients();
+}
+
+function renderPatientAlerts() {
+  const grid = document.getElementById('patientAlertGrid');
+  if (!grid) return;
+  const all = window.patients || [];
+  const tsubu = all.filter(p => p.status === '通院中');
+  const expired = tsubu.filter(p => { const d = getDaysLeft(p); return d !== null && d <= 0; });
+  const within7 = tsubu.filter(p => { const d = getDaysLeft(p); return d !== null && d > 0 && d <= 7; });
+  const within30 = tsubu.filter(p => { const d = getDaysLeft(p); return d !== null && d > 7 && d <= ALERT_DAYS; });
+  grid.innerHTML = `
+    <div class="alert-card alert-red">
+      <div class="alert-num">${expired.length}</div>
+      <div class="alert-label">期限切れ</div>
+    </div>
+    <div class="alert-card alert-orange">
+      <div class="alert-num">${within7.length}</div>
+      <div class="alert-label">7日以内</div>
+    </div>
+    <div class="alert-card alert-yellow">
+      <div class="alert-num">${within30.length}</div>
+      <div class="alert-label">30日以内</div>
+    </div>
+    <div class="alert-card alert-green">
+      <div class="alert-num">${tsubu.length}</div>
+      <div class="alert-label">通院中合計</div>
+    </div>
+  `;
+}
+
+function renderPatientSummary() {
+  const tbody = document.getElementById('patientSummaryBody');
+  if (!tbody) return;
+  tbody.innerHTML = PTS.filter(p => p.active).map(pt => {
+    const my = (window.patients || []).filter(p => p.ptId === pt.id);
+    const tsubu = my.filter(p => p.status === '通院中');
+    const tyu = my.filter(p => p.status === '中断');
+    const within30 = tsubu.filter(p => { const d = getDaysLeft(p); return d !== null && d <= ALERT_DAYS; });
+    const totalFreq = tsubu.reduce((s, p) => s + (parseInt(p.freq, 10) || 0), 0);
+    return `<tr>
+      <td><strong>${pt.name}</strong></td>
+      <td>${my.length}</td>
+      <td>${tsubu.length}</td>
+      <td>${tyu.length}</td>
+      <td>${within30.length > 0 ? `<span style="color:var(--red);font-weight:600">${within30.length}</span>` : '0'}</td>
+      <td>${totalFreq}</td>
+    </tr>`;
+  }).join('');
+}
+
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderHandoverItem(label, value) {
+  if (!value) return '';
+  return `<div style="padding:6px 0;border-bottom:1px dashed var(--border);">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;color:var(--shu);text-transform:uppercase;margin-bottom:3px;">${escapeAttr(label)}</div>
+    <div style="font-size:12.5px;line-height:1.65;">${escapeAttr(value).replace(/\n/g, '<br>')}</div>
+  </div>`;
+}
+
+function renderPatients() {
+  const tbody = document.getElementById('patientTableBody');
+  if (!tbody) return;
+  const filterPt = document.getElementById('patientFilterPt')?.value || '';
+  const filterStatus = document.getElementById('patientFilterStatus')?.value || '';
+  const all = window.patients || [];
+  const filtered = all.filter(p => {
+    if (filterPt && p.ptId !== filterPt) return false;
+    if (filterStatus && p.status !== filterStatus) return false;
+    return true;
+  });
+
+  // セラピストごとにグループ化
+  const grouped = {};
+  filtered.forEach(p => {
+    const key = p.ptId || '_unassigned';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(p);
+  });
+  // 各グループ内で残日数昇順
+  Object.keys(grouped).forEach(k => {
+    grouped[k].sort((a, b) => {
+      const da = getDaysLeft(a); const db = getDaysLeft(b);
+      if (da === null && db === null) return 0;
+      if (da === null) return 1;
+      if (db === null) return -1;
+      return da - db;
+    });
+  });
+
+  const order = PTS.filter(pt => pt.active).map(pt => pt.id);
+  if (grouped['_unassigned']) order.push('_unassigned');
+
+  const html = [];
+  order.forEach(ptId => {
+    const list = grouped[ptId];
+    if (!list || list.length === 0) return;
+    const pt = PTS.find(x => x.id === ptId);
+    const ptName = pt ? pt.name : '(担当未設定)';
+    const tsubuCount = list.filter(p => p.status === '通院中').length;
+    const within30 = list.filter(p => p.status === '通院中').filter(p => { const d = getDaysLeft(p); return d !== null && d <= ALERT_DAYS; }).length;
+    const safeId = ptId.replace(/[^a-zA-Z0-9_]/g, '_');
+
+    html.push(`<tr class="therapist-group-header" onclick="toggleTherapistGroup('${safeId}')">
+      <td colspan="13" style="background:var(--paper-2,#F4F1E8);padding:14px 16px;cursor:pointer;letter-spacing:0.04em;border-top:1px solid var(--border);">
+        <span id="grp-arrow-${safeId}" style="display:inline-block;width:14px;margin-right:10px;color:var(--shu);font-weight:700;">▼</span>
+        <strong style="font-size:14px;">${escapeAttr(ptName)}</strong>
+        <span style="color:var(--dim);font-weight:400;font-size:11.5px;margin-left:14px;">担当 ${list.length}名 / 通院中 ${tsubuCount}名${within30 > 0 ? ` / <span style="color:var(--red);font-weight:600">残30日以下 ${within30}名</span>` : ''}</span>
+      </td>
+    </tr>`);
+
+    list.forEach(p => {
+      const daysLeft = getDaysLeft(p);
+      let daysHtml = '<span style="color:var(--dim)">-</span>';
+      let rowBg = '';
+      if (daysLeft !== null) {
+        if (daysLeft <= 0) { daysHtml = `<span style="color:var(--red);font-weight:700">期限切れ</span>`; rowBg = 'background:#FBE5DD;'; }
+        else if (daysLeft <= 7) { daysHtml = `<span style="color:var(--red);font-weight:700">${daysLeft}日</span>`; rowBg = 'background:#FBEFEA;'; }
+        else if (daysLeft <= ALERT_DAYS) { daysHtml = `<span style="color:#B26B40;font-weight:600">${daysLeft}日</span>`; }
+        else { daysHtml = `${daysLeft}日`; }
+      }
+      const statusClass = p.status === '通院中' ? 'tsuchu' :
+                          p.status === '中断' ? 'chudan' :
+                          p.status === '卒業' ? 'sotsugyo' : 'shuryo';
+      const main = (p.handover && p.handover.main) || p.note || '';
+      const safePid = p.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+      html.push(`<tr class="therapist-row therapist-group-${safeId}" data-pid="${escapeAttr(p.id)}" style="${rowBg}cursor:pointer;" onclick="toggleHandover('${safePid}', event)">
+        <td><strong>${escapeAttr(p.id)}</strong> <span style="font-size:9px;color:var(--dim);margin-left:4px;">▼</span></td>
+        <td>${escapeAttr(p.sex || '-')}</td>
+        <td>${escapeAttr(p.ageGroup || '-')}</td>
+        <td>${escapeAttr(p.insurance || '-')}</td>
+        <td>${escapeAttr(p.category || '-')}</td>
+        <td>${escapeAttr(p.initDate || '-')}</td>
+        <td>${escapeAttr(p.startDate || '-')}</td>
+        <td>${daysHtml}</td>
+        <td>週${p.freq || '-'}回</td>
+        <td>${escapeAttr(ptName)}</td>
+        <td><span class="patient-status-pill ${statusClass}">${escapeAttr(p.status)}</span></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeAttr(main)}">${escapeAttr(main || '-')}</td>
+        <td style="white-space:nowrap" onclick="event.stopPropagation()">
+          <button class="btn btn-secondary btn-sm" onclick="editPatient('${escapeAttr(p.id)}')">編集</button>
+          <button class="btn btn-secondary btn-sm" onclick="deletePatient('${escapeAttr(p.id)}')">削除</button>
+        </td>
+      </tr>`);
+
+      // 申し送り展開行
+      const hv = p.handover || {};
+      const items = [
+        ['主訴', hv.main],
+        ['疼痛部位', hv.painSite],
+        ['疼痛 NRS', hv.nrs],
+        ['ROM 制限', hv.rom],
+        ['筋力低下', hv.muscle],
+        ['ADL 上の困りごと', hv.adl],
+        ['禁忌 / 注意動作', hv.taboo],
+        ['痛みが出やすい動き', hv.painTrigger],
+        ['転倒リスク', hv.fall],
+        ['血圧・めまい・ふらつき', hv.bp],
+        ['医師からの指示', hv.doctor],
+        ['その他注意', hv.other || p.note],
+      ];
+      const hasAny = items.some(([, v]) => v);
+      const hvHtml = hasAny
+        ? items.map(([l, v]) => renderHandoverItem(l, v)).join('')
+        : '<div style="color:var(--dim);font-size:12px;padding:8px 0;">申し送り未入力。「編集」から記入できます。</div>';
+
+      html.push(`<tr class="therapist-group-${safeId} handover-detail" id="handover-${safePid}" style="display:none;">
+        <td colspan="13" style="padding:16px 26px;background:#FAFAF7;border-top:1px solid var(--border);border-bottom:2px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;color:var(--shu);text-transform:uppercase;margin-bottom:12px;">申し送り — ${escapeAttr(p.id)}</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 32px;">${hvHtml}</div>
+        </td>
+      </tr>`);
+    });
+  });
+
+  tbody.innerHTML = html.join('') || `<tr><td colspan="13" style="text-align:center;color:var(--dim);padding:24px;">該当する患者がありません</td></tr>`;
+}
+
+function toggleTherapistGroup(safeId) {
+  const arrow = document.getElementById(`grp-arrow-${safeId}`);
+  const rows = document.querySelectorAll(`.therapist-group-${safeId}`);
+  // 最初の therapist-row の表示状態で開閉判定
+  let isHidden = false;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].classList.contains('therapist-row')) {
+      isHidden = rows[i].style.display === 'none';
+      break;
+    }
+  }
+  rows.forEach(r => {
+    if (r.classList.contains('handover-detail')) {
+      r.style.display = 'none';  // 開閉時に申し送りは閉じる
+    } else {
+      r.style.display = isHidden ? '' : 'none';
+    }
+  });
+  if (arrow) arrow.textContent = isHidden ? '▼' : '▶';
+}
+
+function toggleHandover(safePid, event) {
+  // 編集/削除ボタンのクリックは無視
+  if (event && event.target && (event.target.tagName === 'BUTTON' || event.target.closest && event.target.closest('button'))) return;
+  const row = document.getElementById(`handover-${safePid}`);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? '' : 'none';
+}
+
+// 編集中の患者ID(新規時は null)
+let _editingPatientId = null;
+
+function openPatientModal(mode, patient) {
+  // PT セレクタを生成
+  const ptSel = document.getElementById('pmPtId');
+  if (ptSel) {
+    ptSel.innerHTML = PTS.filter(p => p.active).map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+
+  const titleEl = document.getElementById('patientModalTitle');
+  const idInput = document.getElementById('pmId');
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  // 申し送り入力フィールド一覧(id とフィールド名のマッピング)
+  const HANDOVER_FIELDS = [
+    ['pmHvMain', 'main'],
+    ['pmHvPainSite', 'painSite'],
+    ['pmHvNRS', 'nrs'],
+    ['pmHvROM', 'rom'],
+    ['pmHvMuscle', 'muscle'],
+    ['pmHvADL', 'adl'],
+    ['pmHvTaboo', 'taboo'],
+    ['pmHvPainTrigger', 'painTrigger'],
+    ['pmHvFall', 'fall'],
+    ['pmHvBP', 'bp'],
+    ['pmHvDoctor', 'doctor'],
+    ['pmHvOther', 'other'],
+  ];
+
+  if (mode === 'edit' && patient) {
+    _editingPatientId = patient.id;
+    if (titleEl) titleEl.textContent = `患者編集 — ${patient.id}`;
+    idInput.value = patient.id;
+    idInput.readOnly = true;
+    idInput.style.background = '#F4F1E8';
+    document.getElementById('pmPtId').value = patient.ptId || '';
+    document.getElementById('pmSex').value = patient.sex || '';
+    document.getElementById('pmAgeGroup').value = patient.ageGroup || '';
+    document.getElementById('pmInsurance').value = patient.insurance || '';
+    document.getElementById('pmCategory').value = patient.category || '';
+    document.getElementById('pmInitDate').value = patient.initDate || '';
+    document.getElementById('pmStartDate').value = patient.startDate || '';
+    document.getElementById('pmFreq').value = patient.freq || 1;
+    document.getElementById('pmStatus').value = patient.status || '通院中';
+    // 申し送り(後方互換: 旧 note は handover.other に表示)
+    const hv = patient.handover || {};
+    HANDOVER_FIELDS.forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = hv[key] || '';
+    });
+    if (!hv.other && patient.note) {
+      const el = document.getElementById('pmHvOther');
+      if (el) el.value = patient.note;
+    }
+  } else {
+    // 新規モード
+    _editingPatientId = null;
+    if (titleEl) titleEl.textContent = '患者登録(新規)';
+    const year = new Date().getFullYear();
+    const allIds = (window.patients || []).map(p => p.id);
+    let next = 1;
+    while (allIds.includes(`P-${year}-${String(next).padStart(3, '0')}`)) next++;
+    idInput.value = `P-${year}-${String(next).padStart(3, '0')}`;
+    idInput.readOnly = false;
+    idInput.style.background = '';
+    document.getElementById('pmPtId').value = (PTS.filter(p => p.active)[0] || {}).id || '';
+    document.getElementById('pmSex').value = '';
+    document.getElementById('pmAgeGroup').value = '';
+    document.getElementById('pmInsurance').value = '';
+    document.getElementById('pmCategory').value = '';
+    document.getElementById('pmInitDate').value = today;
+    document.getElementById('pmStartDate').value = today;
+    document.getElementById('pmFreq').value = 1;
+    document.getElementById('pmStatus').value = '通院中';
+    HANDOVER_FIELDS.forEach(([id]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+
+  document.getElementById('patientModalOverlay').classList.add('show');
+  // フォーカスを ID 欄(新規時) or 担当PT(編集時)へ
+  setTimeout(() => {
+    if (mode === 'edit') document.getElementById('pmPtId')?.focus();
+    else document.getElementById('pmId')?.focus();
+  }, 50);
+}
+
+function closePatientModal() {
+  document.getElementById('patientModalOverlay').classList.remove('show');
+  _editingPatientId = null;
+}
+
+function savePatientFromModal() {
+  const id = document.getElementById('pmId').value.trim();
+  const ptId = document.getElementById('pmPtId').value;
+  if (!id) { toast('患者IDを入力してください'); return; }
+  if (!ptId) { toast('担当PTを選択してください'); return; }
+
+  const data = {
+    id,
+    ptId,
+    sex: document.getElementById('pmSex').value,
+    ageGroup: document.getElementById('pmAgeGroup').value.trim(),
+    insurance: document.getElementById('pmInsurance').value,
+    category: document.getElementById('pmCategory').value.trim(),
+    initDate: document.getElementById('pmInitDate').value,
+    startDate: document.getElementById('pmStartDate').value,
+    freq: parseInt(document.getElementById('pmFreq').value, 10) || 0,
+    status: document.getElementById('pmStatus').value,
+    handover: {
+      main: document.getElementById('pmHvMain').value.trim(),
+      painSite: document.getElementById('pmHvPainSite').value.trim(),
+      nrs: document.getElementById('pmHvNRS').value.trim(),
+      rom: document.getElementById('pmHvROM').value.trim(),
+      muscle: document.getElementById('pmHvMuscle').value.trim(),
+      adl: document.getElementById('pmHvADL').value.trim(),
+      taboo: document.getElementById('pmHvTaboo').value.trim(),
+      painTrigger: document.getElementById('pmHvPainTrigger').value.trim(),
+      fall: document.getElementById('pmHvFall').value.trim(),
+      bp: document.getElementById('pmHvBP').value.trim(),
+      doctor: document.getElementById('pmHvDoctor').value.trim(),
+      other: document.getElementById('pmHvOther').value.trim(),
+    },
+  };
+
+  window.patients = window.patients || [];
+
+  if (_editingPatientId) {
+    // 編集
+    const idx = window.patients.findIndex(p => p.id === _editingPatientId);
+    if (idx >= 0) window.patients[idx] = data;
+    toast('更新しました');
+  } else {
+    // 新規
+    if (window.patients.some(p => p.id === id)) {
+      toast('同じIDの患者が既に登録されています');
+      return;
+    }
+    if (IS_DEMO && window.patients.length >= 30) {
+      toast('デモ版は患者 30 名まで。フル機能版で制限解除されます');
+      return;
+    }
+    window.patients.push(data);
+    toast(IS_PRODUCT ? '登録しました' : 'デモ版: リロードで消えます');
+  }
+
+  saveState();
+  closePatientModal();
+  renderPatientPage();
+}
+
+function addPatientDialog() {
+  if (IS_DEMO && (window.patients || []).length >= 30) {
+    toast('デモ版は患者 30 名まで。フル機能版で制限解除されます');
+    return;
+  }
+  if (PTS.filter(p => p.active).length === 0) {
+    toast('先に PT を登録してください(設定画面)');
+    return;
+  }
+  openPatientModal('new', null);
+}
+
+function editPatient(id) {
+  const p = (window.patients || []).find(x => x.id === id);
+  if (!p) return;
+  openPatientModal('edit', p);
+}
+
+function deletePatient(id) {
+  const p = (window.patients || []).find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`患者 ${id} を削除しますか?`)) return;
+  window.patients = (window.patients || []).filter(x => x.id !== id);
+  saveState();
+  renderPatientPage();
+  toast('削除しました');
+}
+
+// ===================================================================
+// MONTHLY REVIEW(月次レビュー + 院長報告)
+// ===================================================================
+function getMonthlyMetrics(mKey) {
+  const md = dailyData[mKey] || {};
+  let units = 0, patients = 0, newPt = 0, plans = 0, cancel = 0;
+  PTS.filter(p => p.active).forEach(pt => {
+    (md[pt.id] || []).forEach(d => {
+      units   += d.units || 0;
+      patients += d.patients || 0;
+      newPt   += d.newPatients || 0;
+      plans   += d.plans || 0;
+      cancel  += d.cancel || 0;
+    });
+  });
+  return { units, patients, newPt, plans, cancel };
+}
+
+function renderReviewMetrics() {
+  const tbody = document.getElementById('reviewMetricsBody');
+  if (!tbody) return;
+  const mKey = cmKey();
+  const idx = MONTHS.findIndex(x => x.key === mKey);
+  const prevKey = idx > 0 ? MONTHS[idx - 1].key : null;
+
+  const cur = getMonthlyMetrics(mKey);
+  const prev = prevKey ? getMonthlyMetrics(prevKey) : { units: '-', patients: '-', newPt: '-', plans: '-', cancel: '-' };
+  const t = (deptTargets[mKey] || {});
+  const targetUnits = t.units || 0;
+  const achievement = targetUnits > 0 ? Math.round(cur.units / targetUnits * 100) : 0;
+
+  const fmtDelta = (curV, prevV) => {
+    if (typeof prevV !== 'number' || typeof curV !== 'number') return '-';
+    const d = curV - prevV;
+    if (d === 0) return '±0';
+    const color = d > 0 ? 'var(--green)' : 'var(--red)';
+    return `<span style="color:${color}">${d > 0 ? '+' : ''}${d}</span>`;
+  };
+
+  const rows = [
+    { label: '月総単位数', val: cur.units, prev: prev.units, target: targetUnits, delta: fmtDelta(cur.units, prev.units) },
+    { label: '実施患者数', val: cur.patients, prev: prev.patients, target: t.patients || '-', delta: fmtDelta(cur.patients, prev.patients) },
+    { label: '新規患者数', val: cur.newPt, prev: prev.newPt, target: t.newPt || '-', delta: fmtDelta(cur.newPt, prev.newPt) },
+    { label: 'キャンセル', val: cur.cancel, prev: prev.cancel, target: '-', delta: fmtDelta(cur.cancel, prev.cancel) },
+    { label: '計画書件数', val: cur.plans, prev: prev.plans, target: t.plans || '-', delta: fmtDelta(cur.plans, prev.plans) },
+    { label: '達成率', val: achievement + '%', prev: '-', target: '100%', delta: '-' },
+  ];
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td><strong>${r.label}</strong></td>
+      <td>${r.val}</td>
+      <td>${r.prev}</td>
+      <td>${r.target}</td>
+      <td>${r.delta}</td>
+    </tr>
+  `).join('');
+}
+
+function renderMonthlyReviewPage() {
+  renderReviewMetrics();
+  const mKey = cmKey();
+  const r = (window.reviews || {})[mKey] || {};
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  set('reviewGood', r.good);
+  for (let i = 1; i <= 3; i++) {
+    const b = (r.blocks || [])[i - 1] || {};
+    set(`reviewBlock${i}`, b.name);
+    set(`reviewBlockNum${i}`, b.num);
+    set(`reviewBlockReason${i}`, b.reason);
+  }
+  const a = r.action || {};
+  set('reviewAction', a.content);
+  set('reviewActionOwner', a.owner);
+  set('reviewActionMetric', a.metric);
+  set('reviewActionDue', a.due);
+  set('reviewActionStop', a.stop);
+  set('reviewShare', r.share);
+
+  const reportEl = document.getElementById('directorReportBody');
+  if (reportEl) {
+    if (r.directorReport) reportEl.innerHTML = r.directorReport;
+    else reportEl.innerHTML = '<span style="color:var(--dim);">上の「院長報告を生成」をクリックすると、ここに A4 1ページ分のレポートが生成されます。</span>';
+  }
+}
+
+function saveReview() {
+  const mKey = cmKey();
+  const get = (id) => document.getElementById(id)?.value || '';
+  window.reviews = window.reviews || {};
+  const prev = window.reviews[mKey] || {};
+  window.reviews[mKey] = {
+    good: get('reviewGood'),
+    blocks: [1, 2, 3].map(i => ({
+      name: get(`reviewBlock${i}`),
+      num: get(`reviewBlockNum${i}`),
+      reason: get(`reviewBlockReason${i}`),
+    })),
+    action: {
+      content: get('reviewAction'),
+      owner: get('reviewActionOwner'),
+      metric: get('reviewActionMetric'),
+      due: get('reviewActionDue'),
+      stop: get('reviewActionStop'),
+    },
+    share: get('reviewShare'),
+    directorReport: prev.directorReport || '',
+  };
+  saveState();
+  toast(IS_PRODUCT ? 'レビューを保存しました' : 'デモ版: リロードで消えます');
+}
+
+function generateDirectorReport() {
+  // 入力値を最新化
+  saveReview();
+  const mKey = cmKey();
+  const m = MONTHS.find(x => x.key === mKey);
+  const r = (window.reviews || {})[mKey] || {};
+  const facility = document.getElementById('facilityName')?.value || '施設名未設定';
+
+  const cur = getMonthlyMetrics(mKey);
+  const t = (deptTargets[mKey] || {});
+  const targetUnits = t.units || 0;
+  const achievement = targetUnits > 0 ? Math.round(cur.units / targetUnits * 100) : 0;
+  const blocks = (r.blocks || []).filter(b => (b.name || b.num || b.reason));
+  const action = r.action || {};
+  const escapeHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const nl2br = (s) => escapeHtml(s).replace(/\n/g, '<br>');
+
+  const html = `
+    <div class="director-report" style="padding:8px 4px;font-family:'Noto Serif JP',serif;color:#0A0A0F;">
+      <h3 style="font-weight:900;font-size:18px;margin:0 0 6px 0;letter-spacing:-0.01em;">リハビリ部門 月次報告</h3>
+      <div style="font-size:12px;color:#6E6E78;margin-bottom:24px;">${escapeHtml(m ? m.label : mKey)} / ${escapeHtml(facility)}</div>
+
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:800;font-size:11px;letter-spacing:0.14em;color:#C8553D;border-left:2px solid #C8553D;padding-left:8px;margin-bottom:8px;">先月の数字(確定値)</div>
+        <div style="font-size:12px;line-height:1.85;">
+          実施単位数: <strong>${cur.units} 単位</strong> / 目標 ${targetUnits} 単位 (達成率 ${achievement}%)<br>
+          実施患者数: ${cur.patients} 人 / 新規 ${cur.newPt} 人<br>
+          キャンセル: ${cur.cancel} 件 / 計画書: ${cur.plans} 件
+        </div>
+      </div>
+
+      ${r.good ? `
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:800;font-size:11px;letter-spacing:0.14em;color:#C8553D;border-left:2px solid #C8553D;padding-left:8px;margin-bottom:8px;">良かった点</div>
+        <div style="font-size:12px;line-height:1.85;">${nl2br(r.good)}</div>
+      </div>` : ''}
+
+      ${blocks.length > 0 ? `
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:800;font-size:11px;letter-spacing:0.14em;color:#C8553D;border-left:2px solid #C8553D;padding-left:8px;margin-bottom:8px;">詰まりポイント</div>
+        <div style="font-size:12px;line-height:1.85;">
+          ${blocks.map(b => `・${escapeHtml(b.name)}${b.num ? ` (${escapeHtml(b.num)})` : ''}${b.reason ? ` — ${escapeHtml(b.reason)}` : ''}`).join('<br>')}
+        </div>
+      </div>` : ''}
+
+      ${action.content ? `
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:800;font-size:11px;letter-spacing:0.14em;color:#C8553D;border-left:2px solid #C8553D;padding-left:8px;margin-bottom:8px;">来月の運用変更</div>
+        <div style="font-size:12px;line-height:1.85;">
+          ${escapeHtml(action.content)}
+          ${action.owner || action.metric || action.due ? `<br><span style="color:#6E6E78;font-size:11px;">
+            ${action.owner ? `担当: ${escapeHtml(action.owner)}` : ''}${action.metric ? ` / 測る指標: ${escapeHtml(action.metric)}` : ''}${action.due ? ` / 期限: ${escapeHtml(action.due)}` : ''}
+          </span>` : ''}
+        </div>
+      </div>` : ''}
+
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:800;font-size:11px;letter-spacing:0.14em;color:#C8553D;border-left:2px solid #C8553D;padding-left:8px;margin-bottom:8px;">院長への相談事項</div>
+        <div style="font-size:12px;line-height:1.85;color:#6E6E78;">該当があれば追記してください</div>
+      </div>
+    </div>
+  `;
+
+  const reportEl = document.getElementById('directorReportBody');
+  if (reportEl) reportEl.innerHTML = html;
+  if (window.reviews && window.reviews[mKey]) {
+    window.reviews[mKey].directorReport = html;
+    saveState();
+  }
+  toast('院長報告を生成しました');
+}
+
+function printDirectorReport() {
+  if (IS_DEMO) {
+    toast('印刷はフル機能版で利用できます');
+    return;
+  }
+  const reportEl = document.getElementById('directorReportBody');
+  if (!reportEl || reportEl.innerText.length < 30) {
+    toast('先に院長報告を生成してください');
+    return;
+  }
+  const html = reportEl.innerHTML;
+  const w = window.open('', '_blank', 'width=820,height=1100');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>院長報告</title>
+    <style>
+      @page { size: A4; margin: 22mm 18mm; }
+      body { font-family: 'Noto Serif JP', serif; font-size: 11pt; line-height: 1.85; color: #0A0A0F; margin: 0; }
+      .director-report { padding: 0; }
+      h3 { margin: 0 0 6px 0; font-weight: 900; font-size: 18pt; }
+    </style>
+    </head><body>${html}</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 600);
+}
+
+// ===================================================================
+// WIZARD(初回起動・商品版のみ)
+// ===================================================================
+let wizardStep = 1;
+const WIZARD_TOTAL = 4;
+const WIZARD_DONE_KEY = 'rb_wizard_done';
+
+function maybeShowWizard() {
+  if (!IS_PRODUCT) return;
+  try {
+    if (localStorage.getItem(WIZARD_DONE_KEY) === 'true') return;
+    if (localStorage.getItem(STORAGE_KEY)) {
+      // 既に保存データがある = 設定済みとみなす
+      localStorage.setItem(WIZARD_DONE_KEY, 'true');
+      return;
+    }
+  } catch (e) { return; }
+  showWizard();
+}
+
+function showWizard() {
+  const overlay = document.getElementById('wizardOverlay');
+  if (!overlay) return;
+  overlay.classList.add('show');
+  wizardStep = 1;
+  showWizardStep(1);
+
+  // PT名簿入力UI
+  const ptListEl = document.getElementById('wizPtList');
+  if (ptListEl) {
+    ptListEl.innerHTML = PTS.map((pt, i) => `
+      <div class="form-group" style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--dim);">PT ${i + 1}</label>
+        <input type="text" data-wiz-pt="${i}" value="${pt.name}" placeholder="名前">
+      </div>
+    `).join('');
+  }
+  // 既存値があれば反映
+  const facEl = document.getElementById('facilityName');
+  const wizFac = document.getElementById('wizFacility');
+  if (facEl && wizFac && facEl.value) wizFac.value = facEl.value;
+  const mKey = cmKey();
+  const t = deptTargets[mKey] || {};
+  ['Units','Patients','New','Plans'].forEach(k => {
+    const lookup = { Units: 'units', Patients: 'patients', New: 'newPt', Plans: 'plans' }[k];
+    const el = document.getElementById('wizTarget' + k);
+    if (el && t[lookup]) el.value = t[lookup];
+  });
+}
+
+function hideWizard() {
+  const overlay = document.getElementById('wizardOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+function showWizardStep(n) {
+  for (let i = 1; i <= WIZARD_TOTAL; i++) {
+    const panel = document.getElementById('wizard-step-' + i);
+    if (panel) panel.style.display = (i === n ? 'block' : 'none');
+  }
+  document.getElementById('wizardStepNum').textContent = n;
+  const prev = document.getElementById('wizPrev');
+  if (prev) prev.style.display = n > 1 ? 'inline-flex' : 'none';
+  const next = document.getElementById('wizNext');
+  if (next) next.textContent = n === WIZARD_TOTAL ? '完了' : '次へ';
+}
+
+function wizardPrev() {
+  if (wizardStep > 1) {
+    wizardStep--;
+    showWizardStep(wizardStep);
+  }
+}
+
+function wizardNext() {
+  if (wizardStep < WIZARD_TOTAL) {
+    wizardStep++;
+    showWizardStep(wizardStep);
+  } else {
+    wizardComplete();
+  }
+}
+
+function wizardSkip() {
+  if (!confirm('初期設定をスキップしますか?(後で「設定」画面から変更できます)')) return;
+  try { localStorage.setItem(WIZARD_DONE_KEY, 'true'); } catch (e) {}
+  hideWizard();
+}
+
+// ===================================================================
+// KPI HELP MODAL
+// ===================================================================
+const KPI_DEFINITIONS = [
+  { num: '01', name: '月間総単位数', desc: '当月にリハ部門で実施した、すべての単位数の合計', good: '部門目標との比較で「今月のペース」を共有', bad: 'PT別単位数を割って少ないPTを名指しで指摘' },
+  { num: '02', name: '月間実施患者数', desc: '当月にリハを1回以上実施したユニーク患者数', good: '単位数とセットで「広く浅く / 狭く深く」のバランスを見る', bad: '患者数だけで部門の働きを評価する' },
+  { num: '03', name: '新規リハ患者数', desc: '当月に「初めて」リハを開始した患者数', good: '3〜6ヶ月の移動平均でトレンドを見る', bad: '単月の上下だけで広報の効果を判断' },
+  { num: '04', name: '初回リハ患者数', desc: '当月に「初回リハ」を実施した患者数', good: '処方→初回のリードタイム把握', bad: '数だけ見て初回到達率の文脈を切る' },
+  { num: '05', name: '2回目移行数', desc: '初回後 30日以内に2回目を実施した患者数', good: '初回後フォロー運用の効果測定', bad: 'PT別に出して初回担当のPTを評価' },
+  { num: '06', name: '2回目移行率', desc: '2回目移行数 / 初回リハ患者数(%)', good: 'ベースラインからの変化を会話のきっかけに', bad: '他院との単純比較' },
+  { num: '07', name: '30日以内再来数', desc: '前回実施から30日以内に再来した実績のあるユニーク患者数', good: '中長期で見る(3ヶ月移動平均)', bad: '医療的根拠の薄い目標に使う' },
+  { num: '08', name: '30日以内再来率', desc: '30日以内再来数 / 月間実施患者数(%)', good: '通院サイクル設計の議論のきっかけ', bad: '「定着率」と言い換えて PT個別評価に転用' },
+  { num: '09', name: '継続患者数', desc: '過去3ヶ月で2回以上の実施があり、当月も実施した患者数', good: '新患増減との対比で見る', bad: '「継続を増やせ」と直接指示する' },
+  { num: '10', name: '離脱患者数', desc: '直近30日来院なし、それ以前60日以内に実績があった患者数', good: '離脱フェーズ別に要因を分解する', bad: '離脱を全部「失敗」と捉える' },
+  { num: '11', name: '離脱率', desc: '離脱 / (継続 + 離脱)(%)', good: '過去の自分との比較で動かす', bad: '他施設との比較で「うちは悪い」と判断' },
+  { num: '12', name: 'キャンセル数', desc: '当月のキャンセル件数', good: 'リマインド・予約方法変更の効果測定', bad: '「キャンセルする患者」をリスト化して扱う' },
+  { num: '13', name: 'キャンセル率', desc: 'キャンセル / (実施 + キャンセル)(%)', good: '予約運用の改善議論のきっかけ', bad: 'PT別に割って評価' },
+  { num: '14', name: 'PT別 実施単位数', desc: 'PTごとの当月実施単位数合計', good: '枠の埋まり方の偏りを部門で見る', bad: '名指しで指摘・ランキング表示・評価面談' },
+  { num: '15', name: 'PT別 実施患者数', desc: 'PTごとに対応した当月のユニーク患者数', good: '担当者交代の引き継ぎ計画に使う', bad: '「もっと患者を見ろ / 絞れ」と短期指示' },
+  { num: '16', name: 'PT別 平均単位数', desc: 'PT別実施単位数 / PT別実施患者数', good: '介入濃度の文脈を理解する', bad: '効率の良し悪しで評価' },
+  { num: '17', name: '計画書件数', desc: '当月発行した計画書の件数', good: '月次会議で「今月分は出揃ったか」を確認', bad: '算定可否の判定根拠にする' },
+  { num: '18', name: '月次目標単位数', desc: '当月の部門目標(設定値)', good: '会話のための共通点として使う', bad: '達成しないと評価が下がる運用' },
+  { num: '19', name: '目標達成率', desc: '月総単位数 / 月次目標単位数(%)', good: '次月の目標と運用の調整議論', bad: 'PT を評価する指標として使う' },
+];
+
+function openKpiHelp() {
+  const body = document.getElementById('kpiHelpBody');
+  if (!body) return;
+  body.innerHTML = KPI_DEFINITIONS.map(k => `
+    <div class="kpi-def-item">
+      <div class="kpi-def-num">${k.num}</div>
+      <div class="kpi-def-content">
+        <h4>${k.name}</h4>
+        <div class="kpi-def-desc">${k.desc}</div>
+        <div class="kpi-def-good">${k.good}</div>
+        <div class="kpi-def-bad">${k.bad}</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('kpiHelpOverlay').classList.add('show');
+}
+
+function closeKpiHelp() {
+  document.getElementById('kpiHelpOverlay').classList.remove('show');
+}
+
+// ===================================================================
+// EXPORT / IMPORT / RESET
+// ===================================================================
+function exportData() {
+  if (IS_DEMO) { toast('エクスポートはフル機能版で利用できます'); return; }
+  const state = {
+    facilityName: document.getElementById('facilityName')?.value || '',
+    PTS, MONTHS, deptTargets, ptTargets, ptDetailTargets, dailyData,
+    patients: window.patients || [],
+    reviews: window.reviews || {},
+    exportDate: new Date().toISOString(),
+    version: 'rb-v3.0',
+  };
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `rehaboard_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('エクスポートしました');
+}
+
+function importData(event) {
+  if (IS_DEMO) { toast('インポートはフル機能版で利用できます'); event.target.value = ''; return; }
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!confirm('インポートすると現在のデータは上書きされます。続行しますか?')) {
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const s = JSON.parse(e.target.result);
+      if (s.PTS) { PTS.length = 0; s.PTS.forEach(p => PTS.push(p)); }
+      if (s.MONTHS) { MONTHS.length = 0; s.MONTHS.forEach(m => MONTHS.push(m)); }
+      if (s.deptTargets) { Object.keys(deptTargets).forEach(k => delete deptTargets[k]); Object.assign(deptTargets, s.deptTargets); }
+      if (s.ptTargets) { Object.keys(ptTargets).forEach(k => delete ptTargets[k]); Object.assign(ptTargets, s.ptTargets); }
+      if (s.ptDetailTargets) { Object.keys(ptDetailTargets).forEach(k => delete ptDetailTargets[k]); Object.assign(ptDetailTargets, s.ptDetailTargets); }
+      if (s.dailyData) { Object.keys(dailyData).forEach(k => delete dailyData[k]); Object.assign(dailyData, s.dailyData); }
+      if (s.patients) window.patients = s.patients;
+      if (s.reviews) window.reviews = s.reviews;
+      if (s.facilityName) {
+        const el = document.getElementById('facilityName');
+        if (el) el.value = s.facilityName;
+      }
+      saveState();
+      renderAll();
+      toast('インポートしました');
+    } catch (err) {
+      console.error(err);
+      toast('インポート失敗: JSON ファイルを確認してください');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetAllData() {
+  if (!confirm('全データをリセットして初期状態に戻しますか?この操作は取り消せません。')) return;
+  if (!confirm('本当によろしいですか?LocalStorage の全データが消えます。')) return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(WIZARD_DONE_KEY);
+  } catch (e) {}
+  toast('リセットしました。リロードします...');
+  setTimeout(() => location.reload(), 800);
+}
+
+function printBriefing() {
+  if (IS_DEMO) { toast('印刷はフル機能版で利用できます'); return; }
+  const text = document.getElementById('briefingText')?.textContent || '';
+  if (!text || text.startsWith('日付を')) { toast('先にサマリーを生成してください'); return; }
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const w = window.open('', '_blank', 'width=820,height=1100');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>朝礼サマリー</title>
+    <style>
+      @page { size: A4; margin: 22mm 18mm; }
+      body { font-family: 'Noto Sans JP', sans-serif; font-size: 11pt; line-height: 1.85; color: #0A0A0F; margin: 0; white-space: pre-wrap; }
+    </style></head><body>${escaped}</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 600);
+}
+
+function wizardComplete() {
+  // 1. 施設名
+  const facV = document.getElementById('wizFacility')?.value.trim();
+  if (facV) {
+    const facEl = document.getElementById('facilityName');
+    if (facEl) facEl.value = facV;
+  }
+  // 2. PT名
+  document.querySelectorAll('[data-wiz-pt]').forEach(input => {
+    const idx = parseInt(input.dataset.wizPt, 10);
+    const v = input.value.trim();
+    if (v && PTS[idx]) PTS[idx].name = v;
+  });
+  // 3. 月次目標(当月)
+  const mKey = cmKey();
+  if (!deptTargets[mKey]) deptTargets[mKey] = {};
+  const tu = parseInt(document.getElementById('wizTargetUnits')?.value, 10);
+  const tp = parseInt(document.getElementById('wizTargetPatients')?.value, 10);
+  const tn = parseInt(document.getElementById('wizTargetNew')?.value, 10);
+  const tpl = parseInt(document.getElementById('wizTargetPlans')?.value, 10);
+  if (!isNaN(tu)) deptTargets[mKey].units = tu;
+  if (!isNaN(tp)) deptTargets[mKey].patients = tp;
+  if (!isNaN(tn)) deptTargets[mKey].newPt = tn;
+  if (!isNaN(tpl)) deptTargets[mKey].plans = tpl;
+  // 4. サンプル削除
+  const choice = document.querySelector('input[name="wizSample"]:checked')?.value;
+  if (choice === 'clear') {
+    Object.keys(dailyData).forEach(k => {
+      if (dailyData[k]) {
+        Object.keys(dailyData[k]).forEach(ptId => {
+          dailyData[k][ptId] = [];
+        });
+      }
+    });
+    window.patients = [];
+    window.reviews = {};
+  }
+  // 完了フラグ
+  try { localStorage.setItem(WIZARD_DONE_KEY, 'true'); } catch (e) {}
+  saveState();
+  hideWizard();
+  renderAll();
+  toast('初期設定が完了しました');
 }
 
 // ===================================================================
@@ -1767,11 +3433,26 @@ function renderAll() {
 // INIT
 // ===================================================================
 function init() {
+  // 商品版なら、保存済みデータを復元(あれば)
+  if (IS_PRODUCT) {
+    const restored = loadState();
+    if (restored) {
+      // 復元成功時のさりげない通知(あとでウィザードと併用)
+      console.log('Loaded saved state from local storage.');
+    }
+  }
+
+  // モード表示用クラス(後の Phase でデモバナー等に使う)
+  document.body.classList.add(IS_PRODUCT ? 'mode-product' : 'mode-demo');
+
   initMonthSelectors();
   renderDashboard();
 
   // Listen for PT change in data input
   document.getElementById('inputPt').addEventListener('change', updateMissingDates);
+
+  // 商品版の初回起動時にウィザード表示
+  setTimeout(() => maybeShowWizard(), 250);
 }
 
 init();
